@@ -861,14 +861,18 @@ function renderVerteilenSichtbarkeit() {
 // ⚠️ Verglichen wird über `sanitizeFilename`, also mit derselben Funktion, die
 // den Namen erzeugt hat. Ein eigener Vergleich (Umlaute, Bindestriche, Groß-
 // schreibung) liefe unweigerlich auseinander.
+//
+// Das Suffix `_<Nachname>_<Vorname>[_N]`, das erzeugen() an den Vorlagennamen hängt.
+// EINE Quelle für Zuordnung UND Anzeigename — zwei eigene Regexe liefen auseinander.
+// Das angehängte „_2" aus der Doppelnamen-Behandlung darf nicht stören.
+function verteilenNamensSuffixRe(r) {
+  const muster = `_${sanitizeFilename(r.nachname)}_${sanitizeFilename(r.vorname)}`;
+  return new RegExp(muster.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(_\\d+)?$", "i");
+}
+
 function verteilenEmpfaengerZuDatei(dateiName) {
   const basis = dateiName.replace(/\.pdf$/i, "");
-  const treffer = recipients.filter((r) => {
-    const muster = `_${sanitizeFilename(r.nachname)}_${sanitizeFilename(r.vorname)}`;
-    // Endet der Name auf das Muster? Ein angehängtes „_2" aus der Doppelnamen-
-    // Behandlung in erzeugen() darf nicht stören.
-    return basis === "" ? false : new RegExp(muster.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(_\\d+)?$", "i").test(basis);
-  });
+  const treffer = recipients.filter((r) => basis !== "" && verteilenNamensSuffixRe(r).test(basis));
   // Zwei Treffer heißen zwei namensgleiche Personen — dann wird nicht geraten.
   return treffer.length === 1 ? treffer[0] : null;
 }
@@ -912,7 +916,8 @@ function renderVerteilenZuordnung() {
     </div>`;
 
   wrap.innerHTML =
-    passend.map((z) => zeile(z, "→ " + z.empfaenger.vorname + " " + z.empfaenger.nachname, "ok")).join("") +
+    passend.map((z) => zeile(z, "→ " + z.empfaenger.vorname + " " + z.empfaenger.nachname
+      + " · erscheint als „" + verteilenAnzeigename(z) + "“", "ok")).join("") +
     ohneKonto.map((z) => zeile(z, "→ " + z.empfaenger.vorname + " " + z.empfaenger.nachname + " — kein Konto in der Tools-Übersicht, kann nicht bereitgestellt werden", "warn")).join("") +
     offen.map((z) => zeile(z, "keiner Person zuzuordnen — wird übersprungen", "warn")).join("");
   wrap.style.display = "";
@@ -985,9 +990,17 @@ async function verteilenAusfuehren() {
 
 // Der Name, den die Person sieht. Der Dateiname trägt Vorlage UND Personennamen —
 // letzterer ist für den Empfänger überflüssig, also nur die Vorlage.
+//
+// ⚠️ Der Titel kommt aus dem DATEINAMEN, nicht aus der oben gewählten Vorlage.
+// Zwischen Erzeugen und Bereitstellen liegt der Word-Lauf außerhalb des Browsers;
+// hochgeladen wird ein früherer Stapel, während in Schritt 1 längst eine andere
+// Vorlage stehen kann. Genau so stand am 2026-08-17 „Übungsleitervertrag" über
+// einem Führungszeugnis. Die Unterstriche stammen aus `sanitizeFilename` und
+// werden wieder zu Leerzeichen.
 function verteilenAnzeigename(z) {
-  const v = currentVorlage();
-  return (v && v.name) || z.name.replace(/\.pdf$/i, "");
+  const basis = z.name.replace(/\.pdf$/i, "");
+  const ohnePerson = z.empfaenger ? basis.replace(verteilenNamensSuffixRe(z.empfaenger), "") : basis;
+  return (ohnePerson || basis).replace(/_/g, " ").trim() || basis;
 }
 
 async function allgemeinBereitstellen(datei) {

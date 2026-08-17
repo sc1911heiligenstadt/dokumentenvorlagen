@@ -65,6 +65,7 @@ const APP_CHANGELOG = [
           "Der Weg dahin: Dokumente erzeugen (ZIP), entpacken, darin „pdf-erzeugen.bat“ doppelklicken — dann die PDFs hier hochladen. So sieht das Ergebnis genau aus wie die Word-Vorlage, mit Briefkopf und Logo.",
           "Neu dafür: Im Tab „Einstellungen“ gibt es jetzt einen Starter zum Herunterladen. Ein PowerShell-Skript startet Windows per Doppelklick nämlich nicht — es öffnet nur den Editor. Beide Dateien in den entpackten Ordner legen, dann reicht ein Doppelklick.",
           "Vor dem Bereitstellen steht die Zuordnung untereinander: Was passt, was keiner Person zuzuordnen ist und wer kein Konto in der Tools-Übersicht hat. Nur das Passende geht raus.",
+          "Der Name, unter dem die Datei bei der Person erscheint, wird aus dem Dateinamen gelesen — nicht aus der Vorlage, die oben gerade ausgewählt ist. Sonst stünde über einem Führungszeugnis „Übungsleitervertrag“, sobald die Auswahl in Schritt 1 inzwischen eine andere ist. In der Zuordnung steht der Name jetzt mit dabei.",
           "Auf Wunsch bekommt die Person eine Meldung aufs Handy, und am Tab „Mein Konto“ erscheint eine kleine rote Zahl.",
           "Darunter neu: „Dateien für alle bereitstellen“ — Merkblätter und Vordrucke, die jeder Angemeldete sehen soll. Und die Liste „Liegt bereit“ mit einem Knopf zum Entfernen.",
           "Bereitgestellt wird nur PDF. Eine Word-Datei mit Vereinsstempel wäre nachträglich änderbar."
