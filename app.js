@@ -610,8 +610,39 @@ const OHNE = "__ohne__"; // Sentinel für „ohne Angabe" (kollidiert mit keinem
 // beantragen und braucht dafür das Vereinsschreiben).
 let filterOrte = new Set();
 
+// Vergleichsform eines Ortsnamens. ⚠️ Sie muss großzügig sein, weil die Orte in
+// den Trainerdaten von Hand getippt sind: „37308 Heiligenstadt", „Heilbad
+// Heiligenstadt", „heiligenstadt" und „Heiligenstadt (Eichsfeld)" meinen alle
+// dasselbe und dürfen nicht als vier Zeilen im Filter stehen.
+function normOrt(s) {
+  return String(s || "")
+    .toLowerCase()
+    .replace(/\([^)]*\)/g, " ")     // Klammerzusatz
+    .replace(/^\s*\d{4,5}\s+/, "")  // vorangestellte Postleitzahl
+    .replace(/^heilbad\s+/, "")     // erst NACH der PLZ, sonst greift es nicht
+    .replace(/[-–—.,/]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// Ortsteil -> Gruppenname. Aus ORT_GRUPPEN (config.js) einmal aufgebaut.
+const ORT_GRUPPE_MAP = (() => {
+  const m = new Map();
+  (typeof ORT_GRUPPEN !== "undefined" ? ORT_GRUPPEN : []).forEach((g) => {
+    (g.orte || []).forEach((o) => m.set(normOrt(o), g.name));
+  });
+  return m;
+})();
+
+// ⚠️ Der Schlüssel ist die Gruppe, sonst die NORMIERTE Form — nicht der rohe
+// Text. Zwei Schreibweisen desselben Ortes wären sonst zwei Filterzeilen, und
+// ein Haken erwischte nur die Hälfte der Leute.
 function ortSchluessel(r) {
-  return String(r.ort || "").trim() || OHNE;
+  const roh = String(r.ort || "").trim();
+  if (!roh) return OHNE;
+  const n = normOrt(roh);
+  if (!n) return OHNE;
+  return ORT_GRUPPE_MAP.get(n) || n;
 }
 
 function updateFilterVisibility() {
@@ -651,10 +682,23 @@ function renderOrtFilter() {
   const wrap = $("filter-orte-liste");
   if (!wrap) return;
 
-  const zaehler = new Map();
+  const zaehler = new Map();  // Schlüssel -> Anzahl Personen
+  const label   = new Map();  // Schlüssel -> Anzeigename (erste gesehene Schreibweise)
+  const teile   = new Map();  // Schlüssel -> Set der Ortsteile, die wirklich vorkommen
   recipients.forEach((r) => {
+    const roh = String(r.ort || "").trim();
     const k = ortSchluessel(r);
     zaehler.set(k, (zaehler.get(k) || 0) + 1);
+    if (k === OHNE) { label.set(k, "(ohne Ort)"); return; }
+    const grp = ORT_GRUPPE_MAP.get(normOrt(roh));
+    if (grp) {
+      label.set(k, grp);
+      if (!teile.has(k)) teile.set(k, new Set());
+      // Der Hauptort selbst ist kein „Ortsteil" — nur die abweichenden nennen.
+      if (normOrt(roh) !== normOrt(grp)) teile.get(k).add(roh);
+    } else if (!label.has(k)) {
+      label.set(k, roh); // Originalschreibweise, nicht die Vergleichsform
+    }
   });
 
   // ⚠️ Orte, die es nach einem Quellenwechsel nicht mehr gibt, aus der Auswahl
@@ -662,19 +706,27 @@ function renderOrtFilter() {
   // ohne dass irgendwo ein gesetztes Kästchen zu sehen wäre.
   [...filterOrte].forEach((k) => { if (!zaehler.has(k)) filterOrte.delete(k); });
 
+  const name = (k) => label.get(k) || k;
   const keys = [...zaehler.keys()].sort((a, b) => {
     if (a === OHNE) return 1;   // „ohne Ort" immer ans Ende
     if (b === OHNE) return -1;
-    return a.localeCompare(b, "de");
+    return name(a).localeCompare(name(b), "de");
   });
 
   wrap.innerHTML = keys.length
-    ? keys.map((k) => `
+    ? keys.map((k) => {
+      // Welche Ortsteile stecken hier drin? Ohne diese Zeile ist nicht zu sehen,
+      // dass ein Haken auf Heiligenstadt auch Kalteneber und Rengelrode mitnimmt.
+      const t = [...(teile.get(k) || [])].sort((a, b) => a.localeCompare(b, "de"));
+      return `
       <label class="filter-ort-zeile">
         <input type="checkbox" data-ort="${esc(k)}" ${filterOrte.has(k) ? "checked" : ""} />
-        <span class="filter-ort-name">${esc(k === OHNE ? "(ohne Ort)" : k)}</span>
+        <span class="filter-ort-name">${esc(name(k))}${
+          t.length ? `<span class="filter-ort-teile">mit ${esc(t.join(", "))}</span>` : ""
+        }</span>
         <span class="filter-ort-zahl">${zaehler.get(k)}</span>
-      </label>`).join("")
+      </label>`;
+    }).join("")
     : `<p class="muted" style="font-size:13px; margin:0;">In den geladenen Daten steht kein Wohnort.</p>`;
 
   wrap.querySelectorAll("input[data-ort]").forEach((cb) => {

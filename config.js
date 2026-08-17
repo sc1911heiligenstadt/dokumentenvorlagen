@@ -54,6 +54,33 @@ const PLATZHALTER_FELDER = [
 // Schnell-Lookup key -> Felddefinition.
 const PLATZHALTER_MAP = Object.fromEntries(PLATZHALTER_FELDER.map(f => [f.key, f]));
 
+// ─── Ortsgruppen für den Wohnort-Filter ───────────────────────────────────────
+// Wozu: Beim erweiterten Führungszeugnis zählt nicht der Ortsname, sondern die
+// zuständige MELDEBEHÖRDE. Die zehn Ortsteile unten sind Teil der Stadt Heilbad
+// Heiligenstadt (Bischhagen, Glasehausen, Mengelrode, Siemerode und Streitholz
+// seit dem 01.01.2024 eingemeindet) — für sie ist dasselbe Meldeamt zuständig,
+// sie werden also zentral beantragt und brauchen das Vereinsschreiben nicht.
+//
+// Ein Ortsteil taucht im Filter deshalb NICHT einzeln auf; ein Haken auf der
+// Gruppe fasst alle mit. Welche Ortsteile in den geladenen Daten wirklich
+// vorkommen, steht klein unter dem Gruppennamen.
+//
+// ⚠️ „Bernterode" ist im Eichsfeld nicht eindeutig — es gibt Bernterode bei
+// Heiligenstadt (hier gemeint) UND Bernterode bei Worbis, das zu einer anderen
+// Verwaltungsgemeinschaft gehört. Steht in den Trainerdaten nur „Bernterode",
+// landet auch letzteres in dieser Gruppe. Wer beide im Bestand hat, muss den
+// Datensatz präzisieren („Bernterode bei Worbis") und den Namen hier ergänzen.
+const ORT_GRUPPEN = [
+  {
+    name: "Heilbad Heiligenstadt",
+    orte: [
+      "Heilbad Heiligenstadt", "Heiligenstadt",
+      "Bernterode", "Bischhagen", "Flinsberg", "Glasehausen", "Günterode",
+      "Kalteneber", "Mengelrode", "Rengelrode", "Siemerode", "Streitholz"
+    ]
+  }
+];
+
 const APP_CHANGELOG = [
   {
     version: "1.4",
@@ -63,6 +90,8 @@ const APP_CHANGELOG = [
         items: [
           "Neuer Filter „Wohnort“ über der Empfängerliste, mit Häkchen statt Auswahlfeld: es lassen sich mehrere Orte auf einmal wählen. Hinter jedem Ort steht, wie viele Personen dort wohnen.",
           "Der Knopf „Umkehren“ ist der kurze Weg zu „alle außer Heiligenstadt“: den eigenen Ort anhaken, umkehren, fertig. Gedacht für das erweiterte Führungszeugnis — wer nicht in Heiligenstadt gemeldet ist, muss es beim eigenen Meldeamt beantragen und braucht dafür das Schreiben des Vereins.",
+          "Die zehn Ortsteile von Heilbad Heiligenstadt (Bernterode, Bischhagen, Flinsberg, Glasehausen, Günterode, Kalteneber, Mengelrode, Rengelrode, Siemerode, Streitholz) stehen nicht einzeln in der Liste — sie stecken in der Gruppe „Heilbad Heiligenstadt“, weil für sie dasselbe Meldeamt zuständig ist. Welche davon wirklich vorkommen, steht klein unter dem Namen.",
+          "Verschiedene Schreibweisen desselben Ortes fallen zu einer Zeile zusammen: „37308 Heiligenstadt“, „Heilbad Heiligenstadt“ und „heiligenstadt“ sind derselbe Ort. Sonst erwischte ein Haken nur einen Teil der Leute.",
           "Ohne Haken zählen alle Orte. Der Filter gibt es nur bei der Quelle „Trainerdaten“ — das Trainerprofil kennt keine Adresse.",
           "Unter dem Bereitstellen steht jetzt, wen eine Meldung aufs Handy überhaupt erreicht: nur wer die Tools-Übersicht als App abgelegt und die Benachrichtigungen eingeschaltet hat. Die rote Zahl am Tab „Mein Konto“ kommt in jedem Fall."
         ]

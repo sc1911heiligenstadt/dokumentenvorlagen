@@ -226,6 +226,10 @@ button.btn:disabled { opacity: 0.5; cursor: default; }
 }
 .filter-ort-zeile input { width: 16px; height: 16px; flex: 0 0 auto; }
 .filter-ort-name { min-width: 0; overflow-wrap: anywhere; }
+/* Die Ortsteile stehen unter dem Gruppennamen, nicht dahinter — dahinter träfen
+   sie bei „Heilbad Heiligenstadt mit Bernterode, Bischhagen, …" am Handy auf die
+   Zahl am rechten Rand. */
+.filter-ort-teile { display: block; font-size: 11px; color: var(--muted); line-height: 1.35; }
 .filter-ort-zahl { margin-left: auto; color: var(--muted); font-size: 12px; flex: 0 0 auto; }
 
 /* Vorlagen-Liste */
