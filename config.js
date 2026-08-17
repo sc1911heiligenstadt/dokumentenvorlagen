@@ -56,6 +56,20 @@ const PLATZHALTER_MAP = Object.fromEntries(PLATZHALTER_FELDER.map(f => [f.key, f
 
 const APP_CHANGELOG = [
   {
+    version: "1.4",
+    groups: [
+      {
+        title: "Nach Wohnort filtern",
+        items: [
+          "Neuer Filter „Wohnort“ über der Empfängerliste, mit Häkchen statt Auswahlfeld: es lassen sich mehrere Orte auf einmal wählen. Hinter jedem Ort steht, wie viele Personen dort wohnen.",
+          "Der Knopf „Umkehren“ ist der kurze Weg zu „alle außer Heiligenstadt“: den eigenen Ort anhaken, umkehren, fertig. Gedacht für das erweiterte Führungszeugnis — wer nicht in Heiligenstadt gemeldet ist, muss es beim eigenen Meldeamt beantragen und braucht dafür das Schreiben des Vereins.",
+          "Ohne Haken zählen alle Orte. Der Filter gibt es nur bei der Quelle „Trainerdaten“ — das Trainerprofil kennt keine Adresse.",
+          "Unter dem Bereitstellen steht jetzt, wen eine Meldung aufs Handy überhaupt erreicht: nur wer die Tools-Übersicht als App abgelegt und die Benachrichtigungen eingeschaltet hat. Die rote Zahl am Tab „Mein Konto“ kommt in jedem Fall."
+        ]
+      }
+    ]
+  },
+  {
     version: "1.3",
     groups: [
       {

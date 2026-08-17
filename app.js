@@ -202,6 +202,8 @@ function wireStaticEvents() {
   ["filter-mannschaft", "filter-lizenz", "filter-vertrag", "filter-fz"].forEach((id) =>
     $(id).addEventListener("change", () => { renderRecipientList(); updateCount(); }));
   $("btn-filter-reset").addEventListener("click", resetFilters);
+  $("btn-orte-keine").addEventListener("click", () => { filterOrte.clear(); renderOrtFilter(); ortFilterGeaendert(); });
+  $("btn-orte-umkehren").addEventListener("click", ortFilterUmkehren);
   // „Alle" wählt bewusst nur die gerade sichtbaren (= gefilterten) Empfänger aus.
   $("btn-recipients-all").addEventListener("click", () => { visibleRecipients().forEach((r) => selectedIds.add(r.id)); renderRecipientList(); updateCount(); });
   $("btn-recipients-none").addEventListener("click", () => { selectedIds.clear(); renderRecipientList(); updateCount(); });
@@ -602,11 +604,27 @@ function filterStatusVerfuegbar() {
 
 const OHNE = "__ohne__"; // Sentinel für „ohne Angabe" (kollidiert mit keinem echten Wert)
 
+// Gewählte Wohnorte. Leer = alle. ⚠️ Bewusst eine Menge und kein Auswahlfeld:
+// gefragt ist „diese paar Dörfer" (Anlass: das erweiterte Führungszeugnis — wer
+// nicht in Heiligenstadt gemeldet ist, muss es selbst beim eigenen Meldeamt
+// beantragen und braucht dafür das Vereinsschreiben).
+let filterOrte = new Set();
+
+function ortSchluessel(r) {
+  return String(r.ort || "").trim() || OHNE;
+}
+
 function updateFilterVisibility() {
   const on = filterStatusVerfuegbar();
   document.querySelectorAll(".filter-status-only").forEach((el) => { el.style.display = on ? "" : "none"; });
   show("filter-status-hint", !on);
-  if (!on) { $("filter-vertrag").value = ""; $("filter-fz").value = ""; }
+  // ⚠️ Auch die Ortsauswahl zurücksetzen, nicht nur ausblenden — ein unsichtbar
+  // gesetzter Haken leerte die Liste sonst heimlich (gleiche Linie wie bei den
+  // beiden Status-Feldern).
+  if (!on) {
+    $("filter-vertrag").value = ""; $("filter-fz").value = "";
+    filterOrte.clear(); ortFilterKopfSetzen();
+  }
 }
 
 // Mannschafts-/Lizenz-Auswahl aus den tatsächlich geladenen Empfängern aufbauen.
@@ -624,6 +642,71 @@ function renderFilterOptions() {
   });
   fillSelect("filter-mannschaft", [...mannschaften].sort((a, b) => a.localeCompare(b, "de")), ohneMannschaft, "ohne Mannschaft");
   fillSelect("filter-lizenz", [...lizenzen].sort((a, b) => a.localeCompare(b, "de")), ohneLizenz, "ohne Lizenz");
+  renderOrtFilter();
+}
+
+// Die Ortsliste kommt aus den geladenen Empfängern, mit Anzahl je Ort — sonst
+// hakt man blind an und weiß erst hinterher, ob überhaupt jemand dort wohnt.
+function renderOrtFilter() {
+  const wrap = $("filter-orte-liste");
+  if (!wrap) return;
+
+  const zaehler = new Map();
+  recipients.forEach((r) => {
+    const k = ortSchluessel(r);
+    zaehler.set(k, (zaehler.get(k) || 0) + 1);
+  });
+
+  // ⚠️ Orte, die es nach einem Quellenwechsel nicht mehr gibt, aus der Auswahl
+  // werfen: ein Haken auf einen verschwundenen Ort filtert die Liste auf null,
+  // ohne dass irgendwo ein gesetztes Kästchen zu sehen wäre.
+  [...filterOrte].forEach((k) => { if (!zaehler.has(k)) filterOrte.delete(k); });
+
+  const keys = [...zaehler.keys()].sort((a, b) => {
+    if (a === OHNE) return 1;   // „ohne Ort" immer ans Ende
+    if (b === OHNE) return -1;
+    return a.localeCompare(b, "de");
+  });
+
+  wrap.innerHTML = keys.length
+    ? keys.map((k) => `
+      <label class="filter-ort-zeile">
+        <input type="checkbox" data-ort="${esc(k)}" ${filterOrte.has(k) ? "checked" : ""} />
+        <span class="filter-ort-name">${esc(k === OHNE ? "(ohne Ort)" : k)}</span>
+        <span class="filter-ort-zahl">${zaehler.get(k)}</span>
+      </label>`).join("")
+    : `<p class="muted" style="font-size:13px; margin:0;">In den geladenen Daten steht kein Wohnort.</p>`;
+
+  wrap.querySelectorAll("input[data-ort]").forEach((cb) => {
+    cb.addEventListener("change", () => {
+      if (cb.checked) filterOrte.add(cb.dataset.ort); else filterOrte.delete(cb.dataset.ort);
+      ortFilterGeaendert();
+    });
+  });
+  ortFilterKopfSetzen();
+}
+
+function ortFilterKopfSetzen() {
+  const s = $("filter-orte-summary");
+  if (!s) return;
+  s.textContent = filterOrte.size ? `Wohnort — ${filterOrte.size} gewählt` : "Wohnort — alle";
+}
+
+function ortFilterGeaendert() {
+  ortFilterKopfSetzen();
+  renderRecipientList(); updateCount(); refreshPreviewIfOpen();
+}
+
+// „Umkehren" ist der kurze Weg zu „alle außer Heiligenstadt": den eigenen Ort
+// anhaken, umkehren, fertig. Ohne den Knopf müsste man zwei Dutzend Dörfer
+// einzeln anklicken.
+function ortFilterUmkehren() {
+  const alle = new Set(recipients.map(ortSchluessel));
+  const neu = new Set();
+  alle.forEach((k) => { if (!filterOrte.has(k)) neu.add(k); });
+  filterOrte = neu;
+  renderOrtFilter();
+  renderRecipientList(); updateCount(); refreshPreviewIfOpen();
 }
 
 function fillSelect(id, werte, mitOhne, ohneLabel) {
@@ -638,6 +721,8 @@ function fillSelect(id, werte, mitOhne, ohneLabel) {
 
 function resetFilters() {
   ["filter-mannschaft", "filter-lizenz", "filter-vertrag", "filter-fz"].forEach((id) => { if ($(id)) $(id).value = ""; });
+  filterOrte.clear();
+  renderOrtFilter();
   $("recipient-search").value = "";
   renderRecipientList();
   updateCount();
@@ -665,6 +750,8 @@ function matchesFilters(r) {
     const fz = val("filter-fz");
     if (fz === "fehlt" && r.fuehrungszeugnisAm) return false;
     if (fz === "vorhanden" && !r.fuehrungszeugnisAm) return false;
+    // Leere Auswahl heißt „alle Orte" — nicht „niemand".
+    if (filterOrte.size && !filterOrte.has(ortSchluessel(r))) return false;
   }
   return true;
 }
@@ -916,9 +1003,11 @@ function verteilenDateienGewaehlt(files) {
 function renderVerteilenZuordnung() {
   const wrap = $("verteilen-zuordnung");
   const aktion = $("verteilen-aktion");
+  const pushHinweis = $("verteilen-push-hinweis");
   if (!verteilenAuswahl.length) {
     wrap.style.display = "none"; wrap.innerHTML = "";
     aktion.style.display = "none";
+    if (pushHinweis) pushHinweis.style.display = "none";
     return;
   }
   const passend = verteilenAuswahl.filter((z) => z.empfaenger && z.empfaenger.username);
@@ -944,6 +1033,7 @@ function renderVerteilenZuordnung() {
     ? `Bereitstellen (${passend.length})`
     : "Bereitstellen";
   aktion.style.display = "";
+  if (pushHinweis) pushHinweis.style.display = passend.length ? "" : "none";
   $("verteilen-status").textContent = "";
 }
 

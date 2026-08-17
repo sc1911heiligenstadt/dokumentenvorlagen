@@ -202,6 +202,32 @@ button.btn:disabled { opacity: 0.5; cursor: default; }
 .recipient-row.missing .r-meta { color: var(--red); }
 #recipient-count.warn { color: var(--red); font-weight: 600; }
 
+/* Wohnort-Filter (Häkchen, Mehrfachauswahl).
+   ⚠️ Die Kästchen stehen bewusst NICHT in einem .form-field — dort greift
+   `input { width: 100% }` und macht aus jeder Checkbox einen Balken quer durch
+   die Karte. Die Breite steht deshalb hier explizit, wie bei .recipient-row. */
+.filter-orte {
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 10px 12px; margin-bottom: 10px;
+}
+.filter-orte > summary {
+  cursor: pointer; font-size: 13px; font-weight: 600; color: var(--blue);
+  list-style-position: inside;
+}
+.filter-orte-kopf {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0 8px;
+}
+/* In sich scrollen: bei zwei Dutzend Dörfern schöbe die Liste sonst die
+   Empfängerauswahl aus dem Bild. */
+.filter-orte-liste { max-height: 200px; overflow-y: auto; }
+.filter-ort-zeile {
+  display: flex; align-items: center; gap: 10px;
+  padding: 5px 2px; cursor: pointer; font-size: 14px;
+}
+.filter-ort-zeile input { width: 16px; height: 16px; flex: 0 0 auto; }
+.filter-ort-name { min-width: 0; overflow-wrap: anywhere; }
+.filter-ort-zahl { margin-left: auto; color: var(--muted); font-size: 12px; flex: 0 0 auto; }
+
 /* Vorlagen-Liste */
 .tpl-item {
   border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 10px;
