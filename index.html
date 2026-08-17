@@ -151,7 +151,8 @@
           <div id="preview-wrap" style="display:none; margin-top:16px; overflow-x:auto;"></div>
           <p class="muted" style="margin-top:16px; font-size:13px; line-height:1.5;">
             Ergebnis sind Word-Dokumente (.docx). Für originalgetreue PDFs das ZIP entpacken und
-            <code>docx-zu-pdf.ps1</code> über den Ordner laufen lassen (siehe Tab „Einstellungen").
+            <code>pdf-erzeugen.bat</code> darin doppelklicken — die beiden nötigen Dateien liegen
+            im Tab „Einstellungen“ zum Herunterladen.
           </p>
         </div>
 
@@ -161,7 +162,7 @@
           <h2>4 · Im Downloadbereich bereitstellen</h2>
           <p class="muted" style="margin-bottom:12px; line-height:1.5;">
             Wähle die fertigen <strong>PDFs</strong> aus — die, die aus Schritt 3 über
-            <code>docx-zu-pdf.ps1</code> entstanden sind. Jede Datei wird über ihren Namen
+            <code>pdf-erzeugen.bat</code> entstanden sind. Jede Datei wird über ihren Namen
             der richtigen Person zugeordnet und erscheint bei ihr in der Tools-Übersicht
             unter „Mein Konto“.
           </p>
@@ -299,14 +300,26 @@
       <div class="card">
         <h3>PDF erzeugen (lokal)</h3>
         <p class="muted" style="line-height:1.6;">
-          Das Tool erzeugt Word-Dokumente. Für <strong>originalgetreue PDFs</strong> das erzeugte ZIP
-          entpacken und im Ordner das Skript <code>docx-zu-pdf.ps1</code> ausführen — es exportiert jede
-          .docx über Microsoft Word als PDF (die Daten verlassen den Rechner nicht). Aufruf in PowerShell
-          im entpackten Ordner: <code>.\docx-zu-pdf.ps1</code>
+          Das Tool erzeugt Word-Dokumente. Für <strong>originalgetreue PDFs</strong> laufen sie einmal
+          durch das Word auf deinem Rechner — die Daten verlassen ihn dabei nicht.
         </p>
-        <div class="btn-row" style="justify-content:flex-start; margin-top:10px;">
-          <a class="btn secondary small" href="docx-zu-pdf.ps1" download>Skript herunterladen (docx-zu-pdf.ps1)</a>
+        <p class="muted" style="line-height:1.6; margin-top:10px;">
+          <strong>So geht es:</strong> Beide Dateien unten einmal herunterladen. Dann das erzeugte ZIP
+          entpacken, beide Dateien in den entpackten Ordner legen und
+          <strong><code>pdf-erzeugen.bat</code> doppelklicken</strong>. Danach liegen die PDFs neben den
+          Word-Dateien — die lädst du oben unter „Dokumente erstellen“ in Schritt 4 hoch.
+        </p>
+        <!-- ⚠️ Der Batch-Starter ist kein Komfort, sondern nötig: Windows führt
+             ein .ps1 per Doppelklick NICHT aus, es öffnet den Editor. Gleiche
+             Lage und gleiche Lösung wie bei den Vertrags-Skripten in Trainerdaten. -->
+        <div class="btn-row" style="justify-content:flex-start; margin-top:10px; flex-wrap:wrap;">
+          <a class="btn secondary small" href="pdf-erzeugen.bat" download>1. Starter herunterladen (pdf-erzeugen.bat)</a>
+          <a class="btn secondary small" href="docx-zu-pdf.ps1" download>2. Skript herunterladen (docx-zu-pdf.ps1)</a>
         </div>
+        <p class="muted" style="margin-top:10px; font-size:12px;">
+          Beide Dateien gehören zusammen und müssen im selben Ordner liegen. Braucht ein installiertes
+          Microsoft Word.
+        </p>
       </div>
     </section>
 
@@ -314,7 +327,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-<script src="config.js?v=1.11"></script>
+<script src="config.js?v=1.12"></script>
 <script src="db.js?v=1.3"></script>
 <script src="docx-fill.js?v=1.0"></script>
 <script src="app.js?v=1.11"></script>
