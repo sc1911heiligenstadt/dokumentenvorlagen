@@ -83,6 +83,18 @@ const ORT_GRUPPEN = [
 
 const APP_CHANGELOG = [
   {
+    version: "1.5",
+    groups: [
+      {
+        title: "Startet schneller",
+        items: [
+          "Die ZIP-Bibliothek, die zum Erzeugen der Word-Dateien gebraucht wird, wird erst geladen, wenn wirklich eine Datei entsteht. Vorher kam sie bei jedem Öffnen der Seite mit, obwohl man sie meist gar nicht braucht — das waren 28 KB pro Aufruf.",
+          "Am Ablauf ändert sich nichts: beim ersten Erzeugen einer Datei lädt sie automatisch nach. Nur wenn dabei keine Internetverbindung besteht, sagt die App es jetzt deutlich."
+        ]
+      }
+    ]
+  },
+  {
     version: "1.4",
     groups: [
       {

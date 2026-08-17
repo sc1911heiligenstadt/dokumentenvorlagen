@@ -136,8 +136,29 @@ const DocxFill = (() => {
     return _keysAus(xml.replace(/<[^>]+>/g, ""));
   }
 
+  // JSZip steht bewusst NICHT fest im <head>: gebraucht wird es nur beim Erzeugen
+  // einer Datei, kostet dort aber 28 KB bei JEDEM Seitenaufbau. Erster Bedarf lädt
+  // nach, jeder weitere Aufruf bekommt dieselbe Promise (Muster aus
+  // raumnutzung/app.js ladeJsZip, fotoauftraege und digitaler-stempel).
+  let _jsZipLadevorgang = null;
+  function _ladeJsZip() {
+    if (typeof JSZip !== "undefined") return Promise.resolve();
+    if (_jsZipLadevorgang) return _jsZipLadevorgang;
+    _jsZipLadevorgang = new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js";
+      s.onload = () => resolve();
+      s.onerror = () => {
+        _jsZipLadevorgang = null; // nächster Versuch darf es erneut probieren
+        reject(new Error("ZIP-Bibliothek konnte nicht geladen werden (Internetverbindung nötig)."));
+      };
+      document.head.appendChild(s);
+    });
+    return _jsZipLadevorgang;
+  }
+
   async function _loadZip(arrayBuffer) {
-    if (typeof JSZip === "undefined") throw new Error("JSZip nicht geladen — bitte Seite neu laden.");
+    await _ladeJsZip();
     return JSZip.loadAsync(arrayBuffer);
   }
 
@@ -198,7 +219,7 @@ const DocxFill = (() => {
   // Massen-Erzeugung: aus EINER Vorlage je Datensatz eine gefüllte .docx, alle in
   // einem ZIP. `datensaetze` = [{ dateiName, werte }]. Muster generiereAlleVertraegeZip.
   async function buildZip(arrayBuffer, datensaetze, onProgress) {
-    if (typeof JSZip === "undefined") throw new Error("JSZip nicht geladen.");
+    await _ladeJsZip();
     // Vorlage einmal laden; pro Datensatz frisch klonen wäre teurer — stattdessen
     // pro Datensatz neu aus dem ArrayBuffer laden (ArrayBuffer bleibt unverändert).
     const zip = new JSZip();
