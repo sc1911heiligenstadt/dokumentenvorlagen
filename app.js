@@ -169,6 +169,9 @@ async function init() {
   renderTemplateList();
   renderTemplateSelect();
   refreshErstellenTab();
+  // ⚠️ Erst HIER, nicht in wireStaticEvents(): die Sichtbarkeit hängt an
+  // canEdit(), und `currentUser` steht erst nach fetchMe() fest.
+  renderVerteilenSichtbarkeit();
 
   // Empfänger der Default-Quelle (Profil) direkt laden, damit die Liste nicht leer wirkt.
   if ((catalog.vorlagen || []).length) onQuelleChanged();
@@ -180,6 +183,7 @@ function wireStaticEvents() {
   document.querySelectorAll("nav button[data-tab]").forEach((btn) => {
     btn.addEventListener("click", () => switchTab(btn.dataset.tab));
   });
+  initVerteilen();
   // Vorlagen-Upload
   $("btn-tpl-file").addEventListener("click", () => $("tpl-file-input").click());
   $("tpl-file-input").addEventListener("change", (e) => onTemplateFileChosen(e.target.files[0]));
@@ -521,6 +525,10 @@ async function loadRecipients() {
         .filter((p) => p.vorname || p.nachname)
         .map((p) => ({
           id: p.username || `${p.vorname} ${p.nachname}`,
+          // Das Gateway-Konto, getrennt von `id`: bei dieser Quelle ist beides
+          // dasselbe, beim Trainerdaten-Weg unten aber NICHT (dort ist `id` die
+          // Trainer-id). Das Bereitstellen braucht den Kontonamen.
+          username: p.username || "",
           vorname: p.vorname || "", nachname: p.nachname || "",
           lizenz: p.lizenz || "", mannschaften: p.mannschaften || []
         }));
@@ -534,6 +542,11 @@ async function loadRecipients() {
           const prof = profiles.find((p) => sameNamePair(p.vorname, p.nachname, t.vorname, t.nachname));
           return {
             id: t.id || `${t.vorname} ${t.nachname}`,
+            // ⚠️ `id` ist hier die Trainer-id aus trainerdaten.json, NICHT das
+            // Gateway-Konto. Für das Bereitstellen im Downloadbereich zählt der
+            // Kontoname — er steht am Datensatz (`username`), sonst hilft der
+            // Namensabgleich aufs Profil (dieselbe Kette wie bei der Lizenz).
+            username: t.username || (prof && prof.username) || "",
             vorname: t.vorname || "", nachname: t.nachname || "",
             geburtsdatum: t.geburtsdatum || "", strasse: t.strasse || "",
             plz: t.plz || "", ort: t.ort || "", telefon: t.telefon || "", email: t.email || "",
@@ -792,4 +805,256 @@ function renderChangelog() {
           <ul>${(g.items || []).map((it) => `<li>${esc(it)}</li>`).join("")}</ul>
         </div>`).join("")}
     </div>`).join("");
+}
+
+// ── Im Downloadbereich bereitstellen (seit 2026-08-17) ────────────────────────
+//
+// Der Schritt nach dem Erzeugen: die fertigen PDFs landen bei den Personen im
+// Tab „Mein Konto" der Tools-Übersicht.
+//
+// ⚠️ Warum PDFs von der Platte statt direkt aus Schritt 3: dieses Tool erzeugt
+// Word-Dateien, und im Browser gibt es keine verlässliche Umwandlung nach PDF.
+// Der Weg führt über `docx-zu-pdf.ps1` (Word-COM) auf dem Rechner — dafür sieht
+// das Ergebnis aus wie die Vorlage, mit Briefkopf und Logo. Michel-Entscheidung
+// vom 2026-08-17 gegen einen nachgebauten Brief.
+//
+// ⚠️ Zugeordnet wird über den DATEINAMEN, nicht über einen gemerkten Zustand.
+// Zwischen Erzeugen und Bereitstellen liegt ein Schritt außerhalb des Browsers;
+// wer die Seite dazwischen neu lädt, hätte sonst nichts mehr in der Hand. Der
+// Name kommt aus `erzeugen()` und lautet `<Vorlage>_<Nachname>_<Vorname>.docx`.
+
+let verteilenAuswahl = [];  // [{ datei, empfaenger|null, name }]
+
+function verteilenVerfuegbar() {
+  return canEdit();
+}
+
+function initVerteilen() {
+  const w = $("btn-verteilen-waehlen");
+  if (!w) return;
+  w.addEventListener("click", () => $("verteilen-input").click());
+  $("verteilen-input").addEventListener("change", (e) => {
+    const files = [...e.target.files]; e.target.value = "";
+    if (files.length) verteilenDateienGewaehlt(files);
+  });
+  $("btn-verteilen").addEventListener("click", verteilenAusfuehren);
+
+  $("btn-allgemein-waehlen").addEventListener("click", () => $("allgemein-input").click());
+  $("allgemein-input").addEventListener("change", (e) => {
+    const f = e.target.files[0]; e.target.value = "";
+    if (f) allgemeinBereitstellen(f);
+  });
+}
+
+// Zeigt die drei Karten nur, wer bereitstellen darf. Der Rest des Tabs steht
+// jedem offen, der Dokumente erzeugen darf — das ist eine andere Frage.
+function renderVerteilenSichtbarkeit() {
+  const an = verteilenVerfuegbar();
+  ["verteilen-card", "allgemein-card", "bereitgestellt-card"].forEach((id) => {
+    const el = $(id); if (el) el.style.display = an ? "" : "none";
+  });
+  if (an) bereitgestelltLaden();
+}
+
+// „Erweitertes_Fuehrungszeugnis_Mueller_Anna.pdf" -> Empfänger Anna Müller.
+//
+// ⚠️ Verglichen wird über `sanitizeFilename`, also mit derselben Funktion, die
+// den Namen erzeugt hat. Ein eigener Vergleich (Umlaute, Bindestriche, Groß-
+// schreibung) liefe unweigerlich auseinander.
+function verteilenEmpfaengerZuDatei(dateiName) {
+  const basis = dateiName.replace(/\.pdf$/i, "");
+  const treffer = recipients.filter((r) => {
+    const muster = `_${sanitizeFilename(r.nachname)}_${sanitizeFilename(r.vorname)}`;
+    // Endet der Name auf das Muster? Ein angehängtes „_2" aus der Doppelnamen-
+    // Behandlung in erzeugen() darf nicht stören.
+    return basis === "" ? false : new RegExp(muster.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(_\\d+)?$", "i").test(basis);
+  });
+  // Zwei Treffer heißen zwei namensgleiche Personen — dann wird nicht geraten.
+  return treffer.length === 1 ? treffer[0] : null;
+}
+
+function verteilenDateienGewaehlt(files) {
+  const fehler = $("verteilen-fehler");
+  fehler.style.display = "none";
+  if (!recipients.length) {
+    fehler.textContent = "Lade zuerst oben die Empfänger — ohne sie lässt sich keine Datei zuordnen.";
+    fehler.style.display = "block";
+    return;
+  }
+  const zuViel = files.length > 60;
+  verteilenAuswahl = files.slice(0, 60).map((datei) => {
+    const emp = verteilenEmpfaengerZuDatei(datei.name);
+    return { datei, empfaenger: emp, name: datei.name };
+  });
+  if (zuViel) {
+    fehler.textContent = "Es werden höchstens 60 Dateien auf einmal verarbeitet — die übrigen bitte in einem zweiten Durchgang.";
+    fehler.style.display = "block";
+  }
+  renderVerteilenZuordnung();
+}
+
+function renderVerteilenZuordnung() {
+  const wrap = $("verteilen-zuordnung");
+  const aktion = $("verteilen-aktion");
+  if (!verteilenAuswahl.length) {
+    wrap.style.display = "none"; wrap.innerHTML = "";
+    aktion.style.display = "none";
+    return;
+  }
+  const passend = verteilenAuswahl.filter((z) => z.empfaenger && z.empfaenger.username);
+  const ohneKonto = verteilenAuswahl.filter((z) => z.empfaenger && !z.empfaenger.username);
+  const offen = verteilenAuswahl.filter((z) => !z.empfaenger);
+
+  const zeile = (z, text, klasse) => `
+    <div class="dv-zuordnung ${klasse}">
+      <span class="dv-zuordnung-datei">${esc(z.name)}</span>
+      <span class="muted">${esc(text)}</span>
+    </div>`;
+
+  wrap.innerHTML =
+    passend.map((z) => zeile(z, "→ " + z.empfaenger.vorname + " " + z.empfaenger.nachname, "ok")).join("") +
+    ohneKonto.map((z) => zeile(z, "→ " + z.empfaenger.vorname + " " + z.empfaenger.nachname + " — kein Konto in der Tools-Übersicht, kann nicht bereitgestellt werden", "warn")).join("") +
+    offen.map((z) => zeile(z, "keiner Person zuzuordnen — wird übersprungen", "warn")).join("");
+  wrap.style.display = "";
+
+  const btn = $("btn-verteilen");
+  btn.disabled = !passend.length;
+  btn.textContent = passend.length
+    ? `Bereitstellen (${passend.length})`
+    : "Bereitstellen";
+  aktion.style.display = "";
+  $("verteilen-status").textContent = "";
+}
+
+async function dateiAlsBase64(datei) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => {
+      const s = String(r.result || "");
+      const komma = s.indexOf(",");
+      resolve(komma >= 0 ? s.slice(komma + 1) : s);
+    };
+    r.onerror = () => reject(new Error("Datei konnte nicht gelesen werden."));
+    r.readAsDataURL(datei);
+  });
+}
+
+// ⚠️ Eine Datei je Aufruf, nacheinander. Ein Sammel-Request mit 60 PDFs à 10 MB
+// wäre ein Rundlauf, an dem ein Worker stirbt — und ein Fehlschlag mittendrin
+// ließe sich nicht mehr zuordnen. So sagt der Bericht am Ende genau, was durch
+// ist und was nicht.
+async function verteilenAusfuehren() {
+  const btn = $("btn-verteilen");
+  const status = $("verteilen-status");
+  const fehler = $("verteilen-fehler");
+  fehler.style.display = "none";
+  const push = $("verteilen-push").checked;
+  const zu = verteilenAuswahl.filter((z) => z.empfaenger && z.empfaenger.username);
+  if (!zu.length) return;
+
+  btn.disabled = true;
+  const gescheitert = [];
+  let fertig = 0;
+  for (const z of zu) {
+    status.textContent = `Stelle bereit… ${fertig}/${zu.length}`;
+    try {
+      const dataBase64 = await dateiAlsBase64(z.datei);
+      await gatewayRequest({
+        action: "unterlage-verteilen",
+        fuer: z.empfaenger.username,
+        name: verteilenAnzeigename(z),
+        dateiName: z.name,
+        push,
+        dataBase64
+      });
+      fertig++;
+    } catch (e) {
+      gescheitert.push(z.name + ": " + (e.message || "Fehler"));
+    }
+  }
+  btn.disabled = false;
+  status.textContent = `✓ ${fertig} von ${zu.length} bereitgestellt.`;
+  if (gescheitert.length) {
+    fehler.textContent = "Nicht bereitgestellt: " + gescheitert.join(" · ");
+    fehler.style.display = "block";
+  }
+  verteilenAuswahl = [];
+  renderVerteilenZuordnung();
+  bereitgestelltLaden();
+}
+
+// Der Name, den die Person sieht. Der Dateiname trägt Vorlage UND Personennamen —
+// letzterer ist für den Empfänger überflüssig, also nur die Vorlage.
+function verteilenAnzeigename(z) {
+  const v = currentVorlage();
+  return (v && v.name) || z.name.replace(/\.pdf$/i, "");
+}
+
+async function allgemeinBereitstellen(datei) {
+  const status = $("allgemein-status");
+  const fehler = $("allgemein-fehler");
+  fehler.style.display = "none";
+  status.textContent = "Lädt hoch…";
+  try {
+    const dataBase64 = await dateiAlsBase64(datei);
+    await gatewayRequest({
+      action: "unterlage-verteilen",
+      fuer: "",
+      name: $("allgemein-name").value.trim() || datei.name.replace(/\.pdf$/i, ""),
+      dateiName: datei.name,
+      dataBase64
+    });
+    status.textContent = "✓ Bereitgestellt.";
+    $("allgemein-name").value = "";
+    setTimeout(() => { status.textContent = ""; }, 2500);
+    bereitgestelltLaden();
+  } catch (e) {
+    status.textContent = "";
+    fehler.textContent = e.message || "Bereitstellen fehlgeschlagen.";
+    fehler.style.display = "block";
+  }
+}
+
+async function bereitgestelltLaden() {
+  const liste = $("bereitgestellt-liste");
+  const leer = $("bereitgestellt-empty");
+  const fehler = $("bereitgestellt-fehler");
+  if (!liste) return;
+  fehler.style.display = "none";
+  let data;
+  try {
+    data = await gatewayRequest({ action: "unterlagen-alle" });
+  } catch (e) {
+    // Ein noch nicht deployter Worker soll keine rote Zeile erzeugen.
+    $("bereitgestellt-card").style.display = "none";
+    return;
+  }
+  const eintraege = Array.isArray(data.eintraege) ? data.eintraege : [];
+  leer.style.display = eintraege.length ? "none" : "";
+  liste.innerHTML = eintraege.map((e) => `
+    <div class="dv-bereit-zeile">
+      <div class="dv-bereit-text">
+        <strong>${esc(e.name)}</strong>
+        <span class="muted" style="font-size:12px;">${esc(e.persoenlich ? "für " + e.fuer : "für alle")} · ${esc(e.dateiName)} · seit ${esc(fmtDateOnly(e.hochgeladenAm))}</span>
+      </div>
+      <button type="button" class="btn danger small" data-bereit-del="${esc(e.id)}">Entfernen</button>
+    </div>`).join("");
+  liste.querySelectorAll("button[data-bereit-del]").forEach((b) => {
+    b.addEventListener("click", () => bereitgestelltEntfernen(b.dataset.bereitDel, b));
+  });
+}
+
+async function bereitgestelltEntfernen(id, btn) {
+  if (!confirm("Diese Unterlage aus dem Downloadbereich entfernen?")) return;
+  const fehler = $("bereitgestellt-fehler");
+  fehler.style.display = "none";
+  btn.disabled = true;
+  try {
+    await gatewayRequest({ action: "unterlage-entfernen", id });
+    bereitgestelltLaden();
+  } catch (e) {
+    btn.disabled = false;
+    fehler.textContent = e.message || "Entfernen fehlgeschlagen.";
+    fehler.style.display = "block";
+  }
 }

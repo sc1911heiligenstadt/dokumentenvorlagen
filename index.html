@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Dokumentenvorlagen</title>
 <meta name="theme-color" content="#1a56a0" />
-<link rel="stylesheet" href="style.css?v=1.5" />
+<link rel="stylesheet" href="style.css?v=1.6" />
 </head>
 <body>
 
@@ -154,6 +154,62 @@
             <code>docx-zu-pdf.ps1</code> über den Ordner laufen lassen (siehe Tab „Einstellungen").
           </p>
         </div>
+
+        <!-- Schritt 4: Bereitstellen. Nur für Bearbeiter — der Rest des Tabs
+             steht jedem offen, der Dokumente erzeugen darf. -->
+        <div class="card" id="verteilen-card" style="display:none;">
+          <h2>4 · Im Downloadbereich bereitstellen</h2>
+          <p class="muted" style="margin-bottom:12px; line-height:1.5;">
+            Wähle die fertigen <strong>PDFs</strong> aus — die, die aus Schritt 3 über
+            <code>docx-zu-pdf.ps1</code> entstanden sind. Jede Datei wird über ihren Namen
+            der richtigen Person zugeordnet und erscheint bei ihr in der Tools-Übersicht
+            unter „Mein Konto“.
+          </p>
+          <div class="btn-row" style="justify-content:flex-start; gap:10px; flex-wrap:wrap;">
+            <button type="button" class="btn small" id="btn-verteilen-waehlen">PDFs wählen…</button>
+            <input type="file" id="verteilen-input" accept="application/pdf" multiple style="display:none;" />
+            <span class="muted" id="verteilen-status" style="font-size:13px;"></span>
+          </div>
+          <div id="verteilen-zuordnung" style="display:none; margin-top:14px;"></div>
+          <div class="btn-row" id="verteilen-aktion" style="display:none; justify-content:flex-start; gap:10px; flex-wrap:wrap; margin-top:12px;">
+            <label style="display:flex; align-items:center; gap:6px; font-size:13px; color:var(--muted); cursor:pointer;">
+              <input type="checkbox" id="verteilen-push" checked /> Meldung aufs Handy schicken
+            </label>
+            <button type="button" class="btn success" id="btn-verteilen">Bereitstellen</button>
+          </div>
+          <p class="muted" id="verteilen-fehler" style="display:none; color:#c0392b; margin-top:10px; font-size:13px;"></p>
+        </div>
+
+        <!-- Dateien, die JEDER sehen soll. Bewusst hier und nicht in einem
+             eigenen Tab: es ist derselbe Downloadbereich, nur ohne Empfänger. -->
+        <div class="card" id="allgemein-card" style="display:none;">
+          <h2>Dateien für alle bereitstellen</h2>
+          <p class="muted" style="margin-bottom:12px; line-height:1.5;">
+            Merkblätter, Vordrucke, Formulare — sichtbar für <strong>jeden Angemeldeten</strong>
+            im Konto-Tab. Nichts Vertrauliches hier ablegen; was nur eine Person bekommen soll,
+            geht über Schritt 4 darüber. Auch hier nur PDF.
+          </p>
+          <div class="form-grid" style="margin-bottom:8px;">
+            <div class="form-field">
+              <label>Anzeigename (leer = Dateiname)</label>
+              <input type="text" id="allgemein-name" placeholder="z. B. Merkblatt Führungszeugnis" />
+            </div>
+          </div>
+          <div class="btn-row" style="justify-content:flex-start; gap:10px; flex-wrap:wrap;">
+            <button type="button" class="btn small" id="btn-allgemein-waehlen">PDF wählen und bereitstellen…</button>
+            <input type="file" id="allgemein-input" accept="application/pdf" style="display:none;" />
+            <span class="muted" id="allgemein-status" style="font-size:13px;"></span>
+          </div>
+          <p class="muted" id="allgemein-fehler" style="display:none; color:#c0392b; margin-top:10px; font-size:13px;"></p>
+        </div>
+
+        <!-- Was gerade bereitliegt, mit Weg zum Entfernen. -->
+        <div class="card" id="bereitgestellt-card" style="display:none;">
+          <h2>Liegt bereit</h2>
+          <div class="empty-state" id="bereitgestellt-empty" style="display:none;">Zurzeit ist nichts bereitgestellt.</div>
+          <div id="bereitgestellt-liste"></div>
+          <p class="muted" id="bereitgestellt-fehler" style="display:none; color:#c0392b; margin-top:10px; font-size:13px;"></p>
+        </div>
       </div>
     </section>
 
@@ -258,9 +314,9 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-<script src="config.js?v=1.10"></script>
+<script src="config.js?v=1.11"></script>
 <script src="db.js?v=1.3"></script>
 <script src="docx-fill.js?v=1.0"></script>
-<script src="app.js?v=1.10"></script>
+<script src="app.js?v=1.11"></script>
 </body>
 </html>

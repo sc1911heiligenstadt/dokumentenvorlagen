@@ -241,3 +241,49 @@ nav .nav-right { margin-left: auto; display: flex; gap: inherit; }
 @media (max-width: 820px) {
   input, select, textarea { font-size: 16px !important; }
 }
+
+/* ── Bereitstellen im Downloadbereich (seit 2026-08-17) ────────────────────── */
+
+/* Zuordnung Datei -> Person. Zwei Spalten, die am Handy umbrechen; der linke
+   Teil traegt den Dateinamen und muss `min-width: 0` haben, sonst sprengt ein
+   langer Name die Karte (ein Flex-Kind schrumpft ohne das nie unter seinen
+   Inhalt). */
+.dv-zuordnung {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  padding: 6px 0;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+}
+.dv-zuordnung:first-child { border-top: none; }
+.dv-zuordnung-datei {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 12px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+/* Der linke Rand traegt die Aussage, nicht die Schriftfarbe: ein rot gefaerbter
+   Text waere auf dem hellen Grund schlechter lesbar und bei Rot-Gruen-Schwaeche
+   gar nicht zu unterscheiden. */
+.dv-zuordnung.ok   { border-left: 3px solid var(--green); padding-left: 8px; }
+.dv-zuordnung.warn { border-left: 3px solid var(--gold);  padding-left: 8px; }
+
+.dv-bereit-zeile {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+.dv-bereit-zeile:first-child { border-top: none; }
+.dv-bereit-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 260px;
+  min-width: 0;
+}
+.dv-bereit-text > * { overflow-wrap: anywhere; min-width: 0; }

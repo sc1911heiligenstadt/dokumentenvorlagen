@@ -56,6 +56,22 @@ const PLATZHALTER_MAP = Object.fromEntries(PLATZHALTER_FELDER.map(f => [f.key, f
 
 const APP_CHANGELOG = [
   {
+    version: "1.1",
+    groups: [
+      {
+        title: "Fertige Dokumente im Downloadbereich bereitstellen",
+        items: [
+          "Neuer Schritt 4 unter „Dokumente erzeugen“: Die fertigen PDFs auswählen — jede Datei wird über ihren Namen automatisch der richtigen Person zugeordnet und landet bei ihr in der Tools-Übersicht unter „Mein Konto“.",
+          "Der Weg dahin bleibt wie gehabt: Dokumente erzeugen (ZIP), entpacken, `docx-zu-pdf.ps1` darüberlaufen lassen — dann die PDFs hier hochladen. So sieht das Ergebnis genau aus wie die Word-Vorlage, mit Briefkopf und Logo.",
+          "Vor dem Bereitstellen steht die Zuordnung untereinander: Was passt, was keiner Person zuzuordnen ist und wer kein Konto in der Tools-Übersicht hat. Nur das Passende geht raus.",
+          "Auf Wunsch bekommt die Person eine Meldung aufs Handy, und am Tab „Mein Konto“ erscheint eine kleine rote Zahl.",
+          "Darunter neu: „Dateien für alle bereitstellen“ — Merkblätter und Vordrucke, die jeder Angemeldete sehen soll. Und die Liste „Liegt bereit“ mit einem Knopf zum Entfernen.",
+          "Bereitgestellt wird nur PDF. Eine Word-Datei mit Vereinsstempel wäre nachträglich änderbar."
+        ]
+      }
+    ]
+  },
+  {
     version: "1.0",
     groups: [
       {
