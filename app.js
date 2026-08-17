@@ -303,7 +303,9 @@ function renderAnalyse(analyse) {
     html += "<div>" + analyse.erkannt.map((k) => fieldChip(k)).join("") + "</div>";
   }
   if (analyse.gesplittet.length) {
-    html += `<p class='warn-banner'>⚠️ Diese Platzhalter sind im Word durch Formatierung unterbrochen und werden <strong>nicht</strong> ersetzt: ${analyse.gesplittet.map((k) => "{{" + esc(k) + "}}").join(", ")}. Bitte im Word einmal am Stück neu eintippen.</p>`;
+    // Seit der automatischen Zusammenführung (docx-fill.js) bleiben hier nur noch die
+    // Fälle übrig, die sie NICHT retten kann — deshalb der andere Hinweistext.
+    html += `<p class='warn-banner'>⚠️ Diese Platzhalter werden <strong>nicht</strong> ersetzt: ${analyse.gesplittet.map((k) => "{{" + esc(k) + "}}").join(", ")}. Im Word steht mitten drin etwas, das sich nicht überbrücken lässt — meist ein Zeilenumbruch oder ein eingefügtes Feld. Bitte den Platzhalter dort einmal löschen und am Stück neu eintippen.</p>`;
   }
   return html;
 }
@@ -375,7 +377,7 @@ function renderTemplateList() {
   wrap.innerHTML = list.map((v) => {
     const chips = (v.erkannt || []).map((k) => fieldChip(k)).join("") || "<span class='muted' style='font-size:13px;'>keine Platzhalter</span>";
     const warn = (v.gesplittet && v.gesplittet.length)
-      ? `<p class='warn-banner'>⚠️ Nicht ersetzbare Platzhalter: ${v.gesplittet.map((k) => "{{" + esc(k) + "}}").join(", ")}</p>` : "";
+      ? `<p class='warn-banner'>⚠️ Nicht ersetzbare Platzhalter: ${v.gesplittet.map((k) => "{{" + esc(k) + "}}").join(", ")} — im Word einmal löschen und am Stück neu eintippen. Steht die Liste noch von früher, hilft „Platzhalter neu einlesen“.</p>` : "";
     return `<div class="tpl-item">
       <div class="tpl-head">
         <span class="tpl-name">${esc(v.name)}</span>

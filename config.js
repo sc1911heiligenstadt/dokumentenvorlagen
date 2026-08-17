@@ -56,6 +56,20 @@ const PLATZHALTER_MAP = Object.fromEntries(PLATZHALTER_FELDER.map(f => [f.key, f
 
 const APP_CHANGELOG = [
   {
+    version: "1.3",
+    groups: [
+      {
+        title: "Von Word zerrissene Platzhalter werden zusammengesetzt",
+        items: [
+          "Word verteilt einen am Stück getippten {{PLATZHALTER}} intern manchmal auf mehrere Textstücke — durch die Rechtschreibprüfung oder eine kurz angefasste Formatierung. Sichtbar ist davon nichts, aber das Werkzeug fand ihn nicht mehr und ließ die Klammer im fertigen Dokument stehen.",
+          "Bisher stand dazu nur eine Warnung mit der Bitte, den Platzhalter im Word neu einzutippen. Das half nur bis zum nächsten Mal — Word zerreißt ihn beim Speichern womöglich wieder.",
+          "Jetzt setzt das Werkzeug solche Platzhalter beim Erzeugen selbst wieder zusammen. Die hochgeladene Word-Datei bleibt dabei unverändert; zusammengefügt wird nur die Kopie, aus der das fertige Dokument entsteht.",
+          "Die Warnung gibt es weiterhin — sie erscheint nur noch, wenn wirklich etwas dazwischenliegt, das sich nicht überbrücken lässt: ein Zeilenumbruch oder ein eingefügtes Feld mitten im Platzhalter."
+        ]
+      }
+    ]
+  },
+  {
     version: "1.2",
     groups: [
       {
