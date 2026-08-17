@@ -634,6 +634,20 @@ const ORT_GRUPPE_MAP = (() => {
   return m;
 })();
 
+// Gruppenname -> die zugehörigen Gemeinden, ohne die Schreibvarianten des
+// Hauptorts selbst. ⚠️ Angezeigt werden ALLE davon, nicht nur die, für die
+// gerade jemand geladen ist (Michel-Vorgabe 2026-08-17): sonst fehlt Flinsberg
+// in der Zeile, sobald dort niemand wohnt — und es sieht aus, als sei es beim
+// Anlegen der Gruppe vergessen worden.
+const ORT_GRUPPE_TEILE = (() => {
+  const m = new Map();
+  (typeof ORT_GRUPPEN !== "undefined" ? ORT_GRUPPEN : []).forEach((g) => {
+    const n = normOrt(g.name);
+    m.set(g.name, (g.orte || []).filter((o) => normOrt(o) !== n));
+  });
+  return m;
+})();
+
 // ⚠️ Der Schlüssel ist die Gruppe, sonst die NORMIERTE Form — nicht der rohe
 // Text. Zwei Schreibweisen desselben Ortes wären sonst zwei Filterzeilen, und
 // ein Haken erwischte nur die Hälfte der Leute.
@@ -684,21 +698,14 @@ function renderOrtFilter() {
 
   const zaehler = new Map();  // Schlüssel -> Anzahl Personen
   const label   = new Map();  // Schlüssel -> Anzeigename (erste gesehene Schreibweise)
-  const teile   = new Map();  // Schlüssel -> Set der Ortsteile, die wirklich vorkommen
   recipients.forEach((r) => {
     const roh = String(r.ort || "").trim();
     const k = ortSchluessel(r);
     zaehler.set(k, (zaehler.get(k) || 0) + 1);
     if (k === OHNE) { label.set(k, "(ohne Ort)"); return; }
     const grp = ORT_GRUPPE_MAP.get(normOrt(roh));
-    if (grp) {
-      label.set(k, grp);
-      if (!teile.has(k)) teile.set(k, new Set());
-      // Der Hauptort selbst ist kein „Ortsteil" — nur die abweichenden nennen.
-      if (normOrt(roh) !== normOrt(grp)) teile.get(k).add(roh);
-    } else if (!label.has(k)) {
-      label.set(k, roh); // Originalschreibweise, nicht die Vergleichsform
-    }
+    if (grp) label.set(k, grp);
+    else if (!label.has(k)) label.set(k, roh); // Originalschreibweise, nicht die Vergleichsform
   });
 
   // ⚠️ Orte, die es nach einem Quellenwechsel nicht mehr gibt, aus der Auswahl
@@ -715,9 +722,11 @@ function renderOrtFilter() {
 
   wrap.innerHTML = keys.length
     ? keys.map((k) => {
-      // Welche Ortsteile stecken hier drin? Ohne diese Zeile ist nicht zu sehen,
+      // Welche Gemeinden stecken hier drin? Ohne diese Zeile ist nicht zu sehen,
       // dass ein Haken auf Heiligenstadt auch Kalteneber und Rengelrode mitnimmt.
-      const t = [...(teile.get(k) || [])].sort((a, b) => a.localeCompare(b, "de"));
+      // ⚠️ Aus der KONFIGURATION, nicht aus den geladenen Daten — die Zeile soll
+      // sagen, was die Gruppe umfasst, nicht wer gerade zufällig geladen ist.
+      const t = [...(ORT_GRUPPE_TEILE.get(k) || [])].sort((a, b) => a.localeCompare(b, "de"));
       return `
       <label class="filter-ort-zeile">
         <input type="checkbox" data-ort="${esc(k)}" ${filterOrte.has(k) ? "checked" : ""} />
