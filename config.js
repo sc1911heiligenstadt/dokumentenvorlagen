@@ -56,6 +56,20 @@ const PLATZHALTER_MAP = Object.fromEntries(PLATZHALTER_FELDER.map(f => [f.key, f
 
 const APP_CHANGELOG = [
   {
+    version: "1.2",
+    groups: [
+      {
+        title: "Platzhalter: die Schreibweise ist jetzt egal",
+        items: [
+          "Bisher zählte nur die reine Großschreibung. Eine Vorlage mit {{Geburtsdatum}} wurde deshalb gar nicht als Platzhalter erkannt — sie wurde beim Hochladen nicht bemängelt und beim Erzeugen nicht gefüllt. Im fertigen Führungszeugnis stand die Klammer dann roh im Text.",
+          "{{Geburtsdatum}}, {{geburtsdatum}} und {{GEBURTSDATUM}} sind ab sofort derselbe Platzhalter.",
+          "Für Vorlagen, die schon im Katalog liegen, gibt es unter „Vorlagen“ den neuen Knopf „Platzhalter neu einlesen“. Die gespeicherte Liste stammt vom Tag des Hochladens; ein Klick liest sie frisch aus dem Dokument. Die Word-Datei selbst wird dabei nicht angefasst.",
+          "Ein Platzhalter, den das Werkzeug nicht kennt, bleibt weiterhin sichtbar im Dokument stehen — ein Fehler fällt so auf, statt still ein leeres Feld zu hinterlassen."
+        ]
+      }
+    ]
+  },
+  {
     version: "1.1",
     groups: [
       {

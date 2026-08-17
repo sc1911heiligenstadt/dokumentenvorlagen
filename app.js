@@ -387,6 +387,7 @@ function renderTemplateList() {
         <button type="button" class="btn secondary small" data-act="rename" data-id="${esc(v.id)}">Umbenennen</button>
         <button type="button" class="btn secondary small" data-act="desc" data-id="${esc(v.id)}">Beschreibung</button>
         <button type="button" class="btn secondary small" data-act="download" data-id="${esc(v.id)}">Vorlage herunterladen</button>
+        <button type="button" class="btn secondary small" data-act="neu-einlesen" data-id="${esc(v.id)}">Platzhalter neu einlesen</button>
         <button type="button" class="btn danger small" data-act="delete" data-id="${esc(v.id)}">Löschen</button>
       </div>
     </div>`;
@@ -412,6 +413,19 @@ async function templateAction(act, id) {
     try {
       const ab = await gatewayFileGet(v.fileId);
       downloadBlob(new Blob([ab], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" }), v.dateiName || (sanitizeFilename(v.name) + ".docx"));
+    } catch (e) { alert(e.message || "Vorlage nicht abrufbar."); }
+  } else if (act === "neu-einlesen") {
+    // Die Platzhalter-Liste im Katalog stammt vom Zeitpunkt des Hochladens. Wird die
+    // Erkennung nachgeschärft (2026-08-17: Schreibweise egal), stimmt sie für ältere
+    // Vorlagen nicht mehr — Vorschau und Warnung zeigten {{Geburtsdatum}} nicht an,
+    // obwohl er im Dokument steht. Hier wird die Vorlage einmal neu analysiert; die
+    // .docx selbst bleibt unangetastet.
+    try {
+      const ab = await gatewayFileGet(v.fileId);
+      const a = await DocxFill.analyzeTemplate(ab);
+      v.ersetzbar = a.ersetzbar; v.erkannt = a.erkannt; v.gesplittet = a.gesplittet;
+      await saveCatalogSafe();
+      renderTemplateList(); refreshErstellenTab();
     } catch (e) { alert(e.message || "Vorlage nicht abrufbar."); }
   } else if (act === "delete") {
     if (!confirm(`Vorlage „${v.name}" wirklich löschen?`)) return;

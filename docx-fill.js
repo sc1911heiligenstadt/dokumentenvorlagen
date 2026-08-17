@@ -30,25 +30,32 @@ const DocxFill = (() => {
     });
   }
 
+  // ⚠️ Die Schreibweise im Word ist EGAL: {{Geburtsdatum}}, {{geburtsdatum}} und
+  // {{GEBURTSDATUM}} sind derselbe Platzhalter. Der erste Regex kannte nur [A-Z0-9_]
+  // — eine Vorlage mit {{Geburtsdatum}} wurde deshalb weder erkannt (also auch nicht
+  // bemängelt) noch ersetzt, und der Platzhalter stand roh im fertigen Behörden-
+  // schreiben (2026-08-17, Führungszeugnis). Intern wird auf GROSS normalisiert,
+  // damit PLATZHALTER_MAP greift; ersetzt wird case-insensitive.
+  const _KEY_RE = /\{\{\s*([A-Za-z0-9_]+)\s*\}\}/g;
+
+  function _keysAus(text) {
+    const set = new Set();
+    const re = new RegExp(_KEY_RE.source, "g"); // eigene lastIndex-Instanz
+    let m;
+    while ((m = re.exec(text)) !== null) set.add(m[1].toUpperCase());
+    return set;
+  }
+
   // {{KEY}}, die DIREKT (am Stück) im XML stehen — nur diese sind per String-
   // Ersetzung befüllbar. Optionale Leerzeichen innerhalb der Klammern erlaubt.
   function _rawKeys(xml) {
-    const set = new Set();
-    const re = /\{\{\s*([A-Z0-9_]+)\s*\}\}/g;
-    let m;
-    while ((m = re.exec(xml)) !== null) set.add(m[1]);
-    return set;
+    return _keysAus(xml);
   }
 
   // {{KEY}} nach dem Entfernen aller XML-Tags — findet zusätzlich gesplittete
   // Platzhalter (die _rawKeys nicht sieht).
   function _allKeys(xml) {
-    const stripped = xml.replace(/<[^>]+>/g, "");
-    const set = new Set();
-    const re = /\{\{\s*([A-Z0-9_]+)\s*\}\}/g;
-    let m;
-    while ((m = re.exec(stripped)) !== null) set.add(m[1]);
-    return set;
+    return _keysAus(xml.replace(/<[^>]+>/g, ""));
   }
 
   async function _loadZip(arrayBuffer) {
@@ -84,7 +91,8 @@ const DocxFill = (() => {
   function _replaceInXml(xml, werte) {
     let out = xml;
     for (const [key, val] of Object.entries(werte)) {
-      const re = new RegExp("\\{\\{\\s*" + key + "\\s*\\}\\}", "g");
+      // "gi": die Schreibweise im Word darf abweichen (siehe _KEY_RE oben).
+      const re = new RegExp("\\{\\{\\s*" + key + "\\s*\\}\\}", "gi");
       out = out.replace(re, () => escXml(val));
     }
     return out;
