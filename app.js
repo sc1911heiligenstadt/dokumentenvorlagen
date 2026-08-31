@@ -50,6 +50,19 @@ function fmtDateOnly(iso) {
   const m = String(iso).match(/^(\d{4})-(\d{2})-(\d{2})/);
   return m ? `${m[3]}.${m[2]}.${m[1]}` : String(iso);
 }
+// ⚠️ NICHT wie fmtDateOnly am ISO-String herumschneiden: dort steht UTC. Ein
+// Zugriff um 00:30 deutscher Zeit stünde sonst mit dem Vortagsdatum da. Datum
+// UND Uhrzeit müssen hier stimmen, sonst taugt die Angabe als Nachweis nichts.
+function fmtDateTime(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return String(iso);
+  return d.toLocaleString("de-DE", {
+    day: "2-digit", month: "2-digit", year: "numeric",
+    hour: "2-digit", minute: "2-digit"
+  }) + " Uhr";
+}
+
 function ibanFmt(iban) {
   if (!iban) return "";
   return String(iban).replace(/\s+/g, "").replace(/(.{4})/g, "$1 ").trim();
@@ -1195,6 +1208,58 @@ async function allgemeinBereitstellen(datei) {
   }
 }
 
+// Wann hat der Empfänger hingesehen, wann gespeichert?
+//
+// ⚠️ Was hier steht, ist der geklickte Knopf im Konto-Tab — nicht, was danach im
+// PDF-Betrachter passiert. Wer „Ansehen" klickt und dort speichert, erscheint als
+// angesehen; deshalb heißt es „angesehen" und nicht „gelesen" oder „erhalten".
+//
+// ⚠️ Der Blick eines Verteilers auf eine fremde persönliche Unterlage zählt
+// serverseitig NICHT mit (siehe admin-worker.js). Sonst stünde hier „angesehen"
+// an einem Dokument, das nur ich selbst kontrolliert habe.
+function bereitZugriff(e) {
+  const liste = Array.isArray(e.zugriffe) ? e.zugriffe : [];
+  const mal = (n) => (n > 1 ? " (" + n + "×)" : "");
+
+  if (e.persoenlich) {
+    const z = liste[0];
+    if (!z || (!z.geoeffnet && !z.geladen)) {
+      return { text: "Noch nicht angesehen", klasse: "offen", detail: "" };
+    }
+    // ⚠️ Das „zuletzt" gehört IN die Ansehen-Angabe, nicht als drittes Stück
+    // hinten dran: dort las es sich, als sei die Datei zuletzt gespeichert
+    // worden (headless gesehen, bevor es hier landete).
+    const nochmal = z.geoeffnet > 1 && z.geoeffnetLetztAm && z.geoeffnetLetztAm !== z.geoeffnetErstAm
+      ? ", zuletzt " + fmtDateTime(z.geoeffnetLetztAm) : "";
+    const teile = [];
+    teile.push(z.geoeffnet
+      ? "Angesehen " + fmtDateTime(z.geoeffnetErstAm) + (z.geoeffnet > 1 ? " (" + z.geoeffnet + "×" + nochmal + ")" : "")
+      : "Nicht angesehen");
+    teile.push(z.geladen
+      ? "gespeichert " + fmtDateTime(z.geladenErstAm) + mal(z.geladen)
+      : "nicht gespeichert");
+    return { text: teile.join(" · "), klasse: "da", detail: "" };
+  }
+
+  // „Für alle": statt einer Person eine Zahl, die Namen im Aufklapper.
+  const angesehen = liste.filter((z) => z.geoeffnet > 0);
+  const gespeichert = liste.filter((z) => z.geladen > 0);
+  if (!angesehen.length && !gespeichert.length) {
+    return { text: "Noch niemand hat sie geöffnet", klasse: "offen", detail: "" };
+  }
+  const zeilen = liste.map((z) => {
+    const t = [];
+    if (z.geoeffnet) t.push("angesehen " + fmtDateTime(z.geoeffnetErstAm) + mal(z.geoeffnet));
+    if (z.geladen) t.push("gespeichert " + fmtDateTime(z.geladenErstAm) + mal(z.geladen));
+    return "<div>" + esc(z.nutzer) + " — " + esc(t.join(" · ")) + "</div>";
+  }).join("");
+  return {
+    text: "Von " + angesehen.length + " " + (angesehen.length === 1 ? "Person" : "Personen") + " angesehen · von " + gespeichert.length + " gespeichert",
+    klasse: "da",
+    detail: '<details class="dv-bereit-wer"><summary>Wer genau</summary>' + zeilen + "</details>"
+  };
+}
+
 async function bereitgestelltLaden() {
   const liste = $("bereitgestellt-liste");
   const leer = $("bereitgestellt-empty");
@@ -1211,14 +1276,19 @@ async function bereitgestelltLaden() {
   }
   const eintraege = Array.isArray(data.eintraege) ? data.eintraege : [];
   leer.style.display = eintraege.length ? "none" : "";
-  liste.innerHTML = eintraege.map((e) => `
+  liste.innerHTML = eintraege.map((e) => {
+    const z = bereitZugriff(e);
+    return `
     <div class="dv-bereit-zeile">
       <div class="dv-bereit-text">
         <strong>${esc(e.name)}</strong>
         <span class="muted" style="font-size:12px;">${esc(e.persoenlich ? "für " + e.fuer : "für alle")} · ${esc(e.dateiName)} · seit ${esc(fmtDateOnly(e.hochgeladenAm))}</span>
+        <span class="dv-bereit-zugriff ${z.klasse}">${esc(z.text)}</span>
+        ${z.detail}
       </div>
       <button type="button" class="btn danger small" data-bereit-del="${esc(e.id)}">Entfernen</button>
-    </div>`).join("");
+    </div>`;
+  }).join("");
   liste.querySelectorAll("button[data-bereit-del]").forEach((b) => {
     b.addEventListener("click", () => bereitgestelltEntfernen(b.dataset.bereitDel, b));
   });

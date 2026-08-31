@@ -83,6 +83,22 @@ const ORT_GRUPPEN = [
 
 const APP_CHANGELOG = [
   {
+    version: "1.8",
+    groups: [
+      {
+        title: "„Liegt bereit“ zeigt jetzt, wer hingeschaut hat",
+        items: [
+          "Unter jedem bereitgestellten Dokument steht ab sofort, ob der Empfänger es angesehen und ob er es gespeichert hat — jeweils mit Datum und Uhrzeit. Wurde mehrfach hineingesehen, steht die Anzahl dabei.",
+          "Solange niemand hingeschaut hat, steht dort „Noch nicht angesehen“. Das ersetzt das Nachfragen, ob ein Vertrag oder ein Behördenschreiben angekommen ist.",
+          "Bei Dateien „für alle“ steht die Zahl der Personen; wer genau, steht im Aufklapper darunter.",
+          "Dafür gibt es in der Tools-Übersicht unter „Unterlagen zum Herunterladen“ jetzt zwei Knöpfe statt einem: „Ansehen“ öffnet das PDF wie bisher, „Speichern“ legt es auf dem Gerät ab.",
+          "Gezählt wird nur der Klick des Empfängers. Wer verteilen darf und selbst hineinsieht, taucht nicht auf — sonst stünde „angesehen“ an einem Dokument, das nur kontrolliert wurde.",
+          "Was jemand nach dem Öffnen im PDF-Betrachter tut (drucken, von dort speichern), sieht die App nicht. Deshalb steht dort „angesehen“ und nicht „gelesen“."
+        ]
+      }
+    ]
+  },
+  {
     version: "1.7",
     groups: [
       {

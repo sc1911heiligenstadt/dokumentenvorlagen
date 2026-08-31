@@ -320,3 +320,16 @@ nav .nav-right { margin-left: auto; display: flex; flex-wrap: wrap; gap: inherit
   min-width: 0;
 }
 .dv-bereit-text > * { overflow-wrap: anywhere; min-width: 0; }
+
+/* Ob jemand hingesehen hat, ist die Frage, wegen der man diese Liste öffnet —
+   deshalb eine eigene Zeile und nicht angehängt an die graue Kleinschrift.
+   Das Zeichen davor trägt die Aussage mit: nur über die Farbe unterscheidbar
+   wäre sie bei Rot-Grün-Schwäche keine Aussage (gleiche Linie wie .dv-zuordnung). */
+.dv-bereit-zugriff { font-size: 12px; }
+.dv-bereit-zugriff.da::before    { content: "✓ "; }
+.dv-bereit-zugriff.offen::before { content: "○ "; }
+.dv-bereit-zugriff.da    { color: #2e7d32; }
+.dv-bereit-zugriff.offen { color: var(--muted, #666); }
+.dv-bereit-wer { font-size: 12px; color: var(--muted, #666); }
+.dv-bereit-wer summary { cursor: pointer; }
+.dv-bereit-wer > div { padding: 2px 0 0 14px; }
