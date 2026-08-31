@@ -1,14 +1,41 @@
 # 📄 Dokumentenvorlagen
 
-Word-Vorlagen (Trainervertrag, Anfragen, Bescheinigungen) mit Platzhaltern zentral verwalten und in einem Rutsch für viele Empfänger befüllen — Daten aus dem Trainerprofil oder, mit der Stufe „Administrieren“ für Trainerdaten, inkl. Adresse und Bankverbindung; Ausgabe als Word-Dokumente, originalgetreue PDFs über ein beiliegendes Skript (nur für berechtigte Gruppe).
+Serienbriefe ohne Word-Serienbrief. Eine `.docx`-Vorlage mit Platzhaltern wird
+einmal hochgeladen; danach genügen zwei Klicks, um daraus für viele Empfänger
+fertige Dokumente zu erzeugen — als ZIP zum Herunterladen oder gleich im
+Downloadbereich für alle bereitgestellt.
 
 **➡️ [Dokumentenvorlagen öffnen](https://sc1911heiligenstadt.github.io/dokumentenvorlagen/)**
+
+## Wie es gedacht ist
+
+1. **Vorlage wählen** — eine der hinterlegten `.docx`-Vorlagen.
+2. **Empfänger wählen** — die Personen, für die Dokumente entstehen sollen.
+3. **Dokumente erzeugen** — die Platzhalter werden ersetzt, das Ergebnis kommt
+   als Paket zurück. Auf Wunsch entsteht dabei direkt ein PDF.
+4. **Im Downloadbereich bereitstellen** — wenn die Dateien nicht nur zu dir,
+   sondern zu allen sollen.
+
+## Was drin ist
+
+| Reiter | Wofür |
+|---|---|
+| **Dokumente erstellen** | Die vier Schritte oben |
+| **Vorlagen** | Vorhandene Vorlagen ansehen, neue hochladen — mit Anzeigename und Beschreibung. Dort steht auch die Liste der **verfügbaren Platzhalter** |
+| **Einstellungen** | Trainerdaten-Zugriff und Verwaltung |
+
+## Die Platzhalter
+
+Welche Platzhalter eine Vorlage kennt, steht im Reiter **Vorlagen**. Gefüllt
+werden sie aus den zentralen Stammdaten — es wird also nichts doppelt gepflegt.
 
 ## Zugang
 
 Die Anmeldung läuft über die [Tools-Übersicht](https://sc1911heiligenstadt.github.io/ToolsUebersicht/) — dort einmal anmelden, danach ist dieses Werkzeug offen.
 
-Die Rechte gelten in drei Stufen: **Sehen** (nur ansehen), **Bearbeiten** (Einträge pflegen) und **Administrieren** (Einstellungen und Verwaltung). Wer welche Stufe hat, legt die Tools-Übersicht fest.
+Die Rechte gelten in drei Stufen: **Sehen** (Vorlagen ansehen), **Bearbeiten**
+(Dokumente erzeugen) und **Administrieren** (Vorlagen hochladen und pflegen,
+Reiter *Einstellungen*). Wer welche Stufe hat, legt die Tools-Übersicht fest.
 
 ## Lokal starten
 
@@ -17,6 +44,10 @@ Die Rechte gelten in drei Stufen: **Sehen** (nur ansehen), **Bearbeiten** (Eintr
 ## Technik
 
 Vanilla JavaScript ohne Build-Schritt — die Dateien werden so ausgeliefert, wie sie im Repo liegen. Veröffentlicht über GitHub Pages. Die Daten liegen in der Vereins-Nextcloud; der Zugriff läuft ausschließlich über den Login-Worker der Tools-Übersicht, nie mit Zugangsdaten im Browser.
+
+Das Zusammenbauen der Dokumente läuft **lokal im Browser**. Die dafür nötige
+ZIP-Bibliothek wird erst geladen, wenn wirklich erzeugt wird — beim Aufrufen der
+Seite kostet sie nichts.
 
 ---
 
