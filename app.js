@@ -634,6 +634,11 @@ let filterOrte = new Set();
 // dasselbe und dürfen nicht als vier Zeilen im Filter stehen.
 function normOrt(s) {
   return String(s || "")
+    // ⚠️ Erst zusammensetzen: ein „ö" kann ein Zeichen sein (U+00F6) oder „o"
+    // + Trema (U+0308). Die Umlaut-Ersetzung unten trifft nur die erste Form,
+    // die zweite bliebe ein eigener Schlüssel — also zwei Filterzeilen für
+    // denselben Ort, und der Haken erwischt nur die Hälfte.
+    .normalize("NFC")
     .toLowerCase()
     // ⚠️ Umlaute umschreiben, sonst sind „Göttingen" und „Goettingen" zwei
     // Zeilen im Filter und ein Haken erwischt nur die eine Hälfte — genau das,
