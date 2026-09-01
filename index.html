@@ -116,7 +116,12 @@
                 <label for="filter-fz">Führungszeugnis</label>
                 <select id="filter-fz">
                   <option value="">Alle</option>
-                  <option value="fehlt">Noch keins hinterlegt</option>
+                  <!-- ⚠️ "Noch keins hinterlegt" ist eine Nachfassliste, keine
+                       Bestandsaufnahme: Einträge ohne Trainervertrag ("nur Kontaktdaten")
+                       sollen gar keins einreichen und bleiben deshalb draußen. Steht so
+                       im Optionstext, damit die fehlenden Namen keine Überraschung sind.
+                       Siehe matchesFilters(). -->
+                  <option value="fehlt">Noch keins hinterlegt (ohne „nur Kontaktdaten“)</option>
                   <option value="vorhanden">Bereits hinterlegt</option>
                 </select>
               </div>
@@ -357,9 +362,9 @@
 <!-- JSZip hängt bewusst NICHT hier: docx-fill.js lädt es beim ersten Bedarf nach
      (_ladeJsZip). Fest eingebunden kostete es 28 KB bei jedem Seitenaufbau, obwohl
      es nur beim Erzeugen einer Datei gebraucht wird. -->
-<script src="config.js?v=1.23"></script>
+<script src="config.js?v=1.24"></script>
 <script src="db.js?v=1.3"></script>
 <script src="docx-fill.js?v=1.3"></script>
-<script src="app.js?v=1.18"></script>
+<script src="app.js?v=1.19"></script>
 </body>
 </html>

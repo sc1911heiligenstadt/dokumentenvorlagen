@@ -588,6 +588,11 @@ async function loadRecipients() {
             // Status-Felder für die Filter — nur in trainerdaten.json vorhanden,
             // nicht im Gateway-Trainerprofil (siehe filterStatusVerfuegbar()).
             fuehrungszeugnisAm: t.fuehrungszeugnisEingereichtAm || "",
+            // ⚠️ Gleiche Ableitung wie _trainerStatus() in der Trainerdaten-App: ein
+            // ausdrücklich gesetzter Status sticht das Gateway-Flag. Wer hier true ist,
+            // bekommt gar keinen Trainervertrag (Geschäftsstelle, Funktionäre) und soll
+            // deshalb auch kein Führungszeugnis einreichen — siehe matchesFilters().
+            nurKontaktdaten: t.status ? t.status === "kontaktdaten" : t.vertragspflichtig === false,
             vertragBereitgestelltAm: t.vertragPdfBereitgestelltAm || "",
             vertragUnterschriebenAm: t.vertragUnterschriebenAm || ""
           };
@@ -821,8 +826,14 @@ function matchesFilters(r) {
       if (vertrag === "offen" && !(bereit && !unter)) return false;
       if (vertrag === "unterschrieben" && !unter) return false;
     }
+    // ⚠️ Die beiden Werte sind NICHT symmetrisch: "vorhanden" ist eine
+    // Bestandsaufnahme (ein hinterlegtes Zeugnis ist eine Tatsache und wird nicht
+    // wegen eines Status unterschlagen), "fehlt" ist eine Nachfassliste — und wer
+    // gar keinen Trainervertrag hat, soll gar keins einreichen. Ohne diese Zeile
+    // schreibt die Geschäftsstelle Leute ans Meldeamt-Bestätigungsschreiben, von
+    // denen sie nie eines wollte. Steht auch im Optionstext (index.html).
     const fz = val("filter-fz");
-    if (fz === "fehlt" && r.fuehrungszeugnisAm) return false;
+    if (fz === "fehlt" && (r.fuehrungszeugnisAm || r.nurKontaktdaten)) return false;
     if (fz === "vorhanden" && !r.fuehrungszeugnisAm) return false;
     // Leere Auswahl heißt „alle Orte" — nicht „niemand".
     if (filterOrte.size && !filterOrte.has(ortSchluessel(r))) return false;

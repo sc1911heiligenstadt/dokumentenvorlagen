@@ -83,6 +83,19 @@ const ORT_GRUPPEN = [
 
 const APP_CHANGELOG = [
   {
+    version: "1.9",
+    groups: [
+      {
+        title: "„Noch keins hinterlegt“ zählt Kontakt-Einträge nicht mehr mit",
+        items: [
+          "Der Führungszeugnis-Filter „Noch keins hinterlegt“ zeigte auch Personen, für die gar kein Trainervertrag vorgesehen ist (Status „Nur Kontaktdaten“ — Geschäftsstelle, Funktionäre). Die sollen gar keins einreichen und standen trotzdem auf der Nachfassliste.",
+          "Sie bleiben jetzt draußen. Der Auswahltext sagt das auch ausdrücklich.",
+          "„Bereits hinterlegt“ bleibt unverändert: Wer eins abgegeben hat, steht weiter drauf — egal welchen Status er hat."
+        ]
+      }
+    ]
+  },
+  {
     version: "1.8",
     groups: [
       {
