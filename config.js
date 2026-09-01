@@ -83,6 +83,20 @@ const ORT_GRUPPEN = [
 
 const APP_CHANGELOG = [
   {
+    version: "1.10",
+    groups: [
+      {
+        title: "„Göttingen“ und „Goettingen“ sind jetzt eine Zeile im Wohnort-Filter",
+        items: [
+          "Wer den Umlaut tippt und wer ihn umschreibt, standen als zwei getrennte Orte untereinander. Ein Haken auf den einen ließ den anderen aus der Empfängerliste fallen.",
+          "Die Zusammenfassung kennt jetzt ä/ö/ü/ß. „Mühlhausen“ und „Muehlhausen“, „Weißensee“ und „Weissensee“ fallen zusammen, genau wie die Heiligenstädter Schreibweisen es schon vorher taten.",
+          "An den Ortsteilen ändert sich nichts: ein Haken auf Heilbad Heiligenstadt nimmt weiter Kalteneber, Rengelrode und die übrigen mit.",
+          "Dieselbe Korrektur steckt in der Wohnort-Auswahl des CSV-Exports der App „Trainerdaten“ — beide müssen bei gleicher Datenlage gleich filtern."
+        ]
+      }
+    ]
+  },
+  {
     version: "1.9",
     groups: [
       {
