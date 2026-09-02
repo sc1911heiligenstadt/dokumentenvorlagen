@@ -1,0 +1,13 @@
+.claude/
+
+# Word-Sperrdateien
+~$*
+
+# Vorlagen-Dokumente: die App laedt ihre .docx-Vorlagen zur Laufzeit aus
+# Nextcloud, nicht aus dem Repo -- lokale Exemplare sind Testdateien. Dieses
+# Repo ist oeffentlich, und ein versehentlich ausgefuelltes Exemplar traegt
+# Personendaten (Name, Anschrift, Verguetung). Deshalb generell draussen.
+*.docx
+
+# Lokales Claude-Projektgedaechtnis, nicht Teil des oeffentlichen Repos
+CLAUDE.md
