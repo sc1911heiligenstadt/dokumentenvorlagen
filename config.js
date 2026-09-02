@@ -83,190 +83,51 @@ const ORT_GRUPPEN = [
 
 const APP_CHANGELOG = [
   {
-    version: "1.11",
-    groups: [
-      {
-        title: "Wohnort-Filter: derselbe Ort stand in einem Sonderfall doch noch doppelt",
-        items: [
-          "Ein „ö“ kann auf zwei Arten im Rechner stehen: als ein Zeichen, oder als „o“ mit einem getrennt gespeicherten Pünktchen-Zeichen dahinter. Auf dem Bildschirm sieht beides gleich aus.",
-          "Die Zusammenfassung von „Göttingen“ und „Goettingen“ griff nur bei der ersten Art. Bei der zweiten stand der Ort trotzdem doppelt da — genau der Fehler, der zuletzt behoben werden sollte.",
-          "Die zweite Art entsteht beim Kopieren von einem Mac oder iPhone und beim Import aus älteren Dateien.",
-          "Jetzt werden beide Arten gleich behandelt."
-        ]
-      }
-    ]
-  },
-  {
-    version: "1.10",
-    groups: [
-      {
-        title: "„Göttingen“ und „Goettingen“ sind jetzt eine Zeile im Wohnort-Filter",
-        items: [
-          "Wer den Umlaut tippt und wer ihn umschreibt, standen als zwei getrennte Orte untereinander. Ein Haken auf den einen ließ den anderen aus der Empfängerliste fallen.",
-          "Die Zusammenfassung kennt jetzt ä/ö/ü/ß. „Mühlhausen“ und „Muehlhausen“, „Weißensee“ und „Weissensee“ fallen zusammen, genau wie die Heiligenstädter Schreibweisen es schon vorher taten.",
-          "An den Ortsteilen ändert sich nichts: ein Haken auf Heilbad Heiligenstadt nimmt weiter Kalteneber, Rengelrode und die übrigen mit.",
-          "Dieselbe Korrektur steckt in der Wohnort-Auswahl des CSV-Exports der App „Trainerdaten“ — beide müssen bei gleicher Datenlage gleich filtern."
-        ]
-      }
-    ]
-  },
-  {
-    version: "1.9",
-    groups: [
-      {
-        title: "„Noch keins hinterlegt“ zählt Kontakt-Einträge nicht mehr mit",
-        items: [
-          "Der Führungszeugnis-Filter „Noch keins hinterlegt“ zeigte auch Personen, für die gar kein Trainervertrag vorgesehen ist (Status „Nur Kontaktdaten“ — Geschäftsstelle, Funktionäre). Die sollen gar keins einreichen und standen trotzdem auf der Nachfassliste.",
-          "Sie bleiben jetzt draußen. Der Auswahltext sagt das auch ausdrücklich.",
-          "„Bereits hinterlegt“ bleibt unverändert: Wer eins abgegeben hat, steht weiter drauf — egal welchen Status er hat."
-        ]
-      }
-    ]
-  },
-  {
-    version: "1.8",
-    groups: [
-      {
-        title: "„Liegt bereit“ zeigt jetzt, wer hingeschaut hat",
-        items: [
-          "Unter jedem bereitgestellten Dokument steht ab sofort, ob der Empfänger es angesehen und ob er es gespeichert hat — jeweils mit Datum und Uhrzeit. Wurde mehrfach hineingesehen, steht die Anzahl dabei.",
-          "Solange niemand hingeschaut hat, steht dort „Noch nicht angesehen“. Das ersetzt das Nachfragen, ob ein Vertrag oder ein Behördenschreiben angekommen ist.",
-          "Bei Dateien „für alle“ steht die Zahl der Personen; wer genau, steht im Aufklapper darunter.",
-          "Dafür gibt es in der Tools-Übersicht unter „Unterlagen zum Herunterladen“ jetzt zwei Knöpfe statt einem: „Ansehen“ öffnet das PDF wie bisher, „Speichern“ legt es auf dem Gerät ab.",
-          "Gezählt wird nur der Klick des Empfängers. Wer verteilen darf und selbst hineinsieht, taucht nicht auf — sonst stünde „angesehen“ an einem Dokument, das nur kontrolliert wurde.",
-          "Was jemand nach dem Öffnen im PDF-Betrachter tut (drucken, von dort speichern), sieht die App nicht. Deshalb steht dort „angesehen“ und nicht „gelesen“."
-        ]
-      }
-    ]
-  },
-  {
-    version: "1.7",
-    groups: [
-      {
-        title: "Der Reiter „Info“ erklärt jetzt, was die App wirklich tut",
-        items: [
-          "Dort stand bisher ein einzelner Satz. Jetzt steht da, wofür die einzelnen Reiter da sind, was die App mit den Eingaben macht und wo etwas anderes hingehört.",
-          "Am Funktionsumfang ändert sich nichts — nur an der Beschreibung."
-        ]
-      }
-    ]
-  },
-  {
-    version: "1.6",
-    groups: [
-      {
-        title: "Am Handy",
-        items: [
-          "Bisher brach die Reiterleiste selbst um, die rechte Reiter-Gruppe darin aber nicht: Sie rutschte als ein Stück in die zweite Zeile und lief dort weiter über den rechten Rand hinaus. Jetzt bricht auch sie um, sobald sie zu breit wird. Zu sehen ist das nur, wenn genug Reiter nebeneinanderstehen — bis dahin sieht alles aus wie bisher."
-        ]
-      }
-    ]
-  },
-  {
-    version: "1.5",
-    groups: [
-      {
-        title: "Startet schneller",
-        items: [
-          "Die ZIP-Bibliothek, die zum Erzeugen der Word-Dateien gebraucht wird, wird erst geladen, wenn wirklich eine Datei entsteht. Vorher kam sie bei jedem Öffnen der Seite mit, obwohl man sie meist gar nicht braucht — das waren 28 KB pro Aufruf.",
-          "Am Ablauf ändert sich nichts: beim ersten Erzeugen einer Datei lädt sie automatisch nach. Nur wenn dabei keine Internetverbindung besteht, sagt die App es jetzt deutlich."
-        ]
-      }
-    ]
-  },
-  {
-    version: "1.4",
-    groups: [
-      {
-        title: "Nach Wohnort filtern",
-        items: [
-          "Neuer Filter „Wohnort“ über der Empfängerliste, mit Häkchen statt Auswahlfeld: es lassen sich mehrere Orte auf einmal wählen. Hinter jedem Ort steht, wie viele Personen dort wohnen.",
-          "Der Knopf „Umkehren“ ist der kurze Weg zu „alle außer Heiligenstadt“: den eigenen Ort anhaken, umkehren, fertig. Gedacht für das erweiterte Führungszeugnis — wer nicht in Heiligenstadt gemeldet ist, muss es beim eigenen Meldeamt beantragen und braucht dafür das Schreiben des Vereins.",
-          "Die zehn Ortsteile von Heilbad Heiligenstadt stehen nicht einzeln in der Liste — sie stecken in der Gruppe „Heilbad Heiligenstadt“, weil für sie dasselbe Meldeamt zuständig ist. Alle zehn sind klein unter dem Namen aufgeführt, auch wenn dort gerade niemand wohnt: so ist zu sehen, was die Gruppe umfasst.",
-          "Verschiedene Schreibweisen desselben Ortes fallen zu einer Zeile zusammen: „37308 Heiligenstadt“, „Heilbad Heiligenstadt“ und „heiligenstadt“ sind derselbe Ort. Sonst erwischte ein Haken nur einen Teil der Leute.",
-          "Ohne Haken zählen alle Orte. Der Filter gibt es nur bei der Quelle „Trainerdaten“ — das Trainerprofil kennt keine Adresse.",
-          "Unter dem Bereitstellen steht jetzt, wen eine Meldung aufs Handy überhaupt erreicht: nur wer die Tools-Übersicht als App abgelegt und die Benachrichtigungen eingeschaltet hat. Die rote Zahl am Tab „Mein Konto“ kommt in jedem Fall."
-        ]
-      }
-    ]
-  },
-  {
-    version: "1.3",
-    groups: [
-      {
-        title: "Von Word zerrissene Platzhalter werden zusammengesetzt",
-        items: [
-          "Word verteilt einen am Stück getippten {{PLATZHALTER}} intern manchmal auf mehrere Textstücke — durch die Rechtschreibprüfung oder eine kurz angefasste Formatierung. Sichtbar ist davon nichts, aber das Werkzeug fand ihn nicht mehr und ließ die Klammer im fertigen Dokument stehen.",
-          "Bisher stand dazu nur eine Warnung mit der Bitte, den Platzhalter im Word neu einzutippen. Das half nur bis zum nächsten Mal — Word zerreißt ihn beim Speichern womöglich wieder.",
-          "Jetzt setzt das Werkzeug solche Platzhalter beim Erzeugen selbst wieder zusammen. Die hochgeladene Word-Datei bleibt dabei unverändert; zusammengefügt wird nur die Kopie, aus der das fertige Dokument entsteht.",
-          "Die Warnung gibt es weiterhin — sie erscheint nur noch, wenn wirklich etwas dazwischenliegt, das sich nicht überbrücken lässt: ein Zeilenumbruch oder ein eingefügtes Feld mitten im Platzhalter."
-        ]
-      }
-    ]
-  },
-  {
-    version: "1.2",
-    groups: [
-      {
-        title: "Platzhalter: die Schreibweise ist jetzt egal",
-        items: [
-          "Bisher zählte nur die reine Großschreibung. Eine Vorlage mit {{Geburtsdatum}} wurde deshalb gar nicht als Platzhalter erkannt — sie wurde beim Hochladen nicht bemängelt und beim Erzeugen nicht gefüllt. Im fertigen Führungszeugnis stand die Klammer dann roh im Text.",
-          "{{Geburtsdatum}}, {{geburtsdatum}} und {{GEBURTSDATUM}} sind ab sofort derselbe Platzhalter.",
-          "Für Vorlagen, die schon im Katalog liegen, gibt es unter „Vorlagen“ den neuen Knopf „Platzhalter neu einlesen“. Die gespeicherte Liste stammt vom Tag des Hochladens; ein Klick liest sie frisch aus dem Dokument. Die Word-Datei selbst wird dabei nicht angefasst.",
-          "Ein Platzhalter, den das Werkzeug nicht kennt, bleibt weiterhin sichtbar im Dokument stehen — ein Fehler fällt so auf, statt still ein leeres Feld zu hinterlassen."
-        ]
-      }
-    ]
-  },
-  {
-    version: "1.1",
-    groups: [
-      {
-        title: "Fertige Dokumente im Downloadbereich bereitstellen",
-        items: [
-          "Neuer Schritt 4 unter „Dokumente erzeugen“: Die fertigen PDFs auswählen — jede Datei wird über ihren Namen automatisch der richtigen Person zugeordnet und landet bei ihr in der Tools-Übersicht unter „Mein Konto“.",
-          "Der Weg dahin: Dokumente erzeugen (ZIP), entpacken, darin „pdf-erzeugen.bat“ doppelklicken — dann die PDFs hier hochladen. So sieht das Ergebnis genau aus wie die Word-Vorlage, mit Briefkopf und Logo.",
-          "Neu dafür: Im Tab „Einstellungen“ gibt es jetzt einen Starter zum Herunterladen. Ein PowerShell-Skript startet Windows per Doppelklick nämlich nicht — es öffnet nur den Editor. Beide Dateien in den entpackten Ordner legen, dann reicht ein Doppelklick.",
-          "Vor dem Bereitstellen steht die Zuordnung untereinander: Was passt, was keiner Person zuzuordnen ist und wer kein Konto in der Tools-Übersicht hat. Nur das Passende geht raus.",
-          "Der Name, unter dem die Datei bei der Person erscheint, wird aus dem Dateinamen gelesen — nicht aus der Vorlage, die oben gerade ausgewählt ist. Sonst stünde über einem Führungszeugnis „Übungsleitervertrag“, sobald die Auswahl in Schritt 1 inzwischen eine andere ist. In der Zuordnung steht der Name jetzt mit dabei.",
-          "Auf Wunsch bekommt die Person eine Meldung aufs Handy, und am Tab „Mein Konto“ erscheint eine kleine rote Zahl.",
-          "Darunter neu: „Dateien für alle bereitstellen“ — Merkblätter und Vordrucke, die jeder Angemeldete sehen soll. Und die Liste „Liegt bereit“ mit einem Knopf zum Entfernen.",
-          "Bereitgestellt wird nur PDF. Eine Word-Datei mit Vereinsstempel wäre nachträglich änderbar."
-        ]
-      }
-    ]
-  },
-  {
     version: "1.0",
     groups: [
       {
         title: "Serienbrief aus Word-Vorlagen",
         items: [
           "Vorlagen-Katalog: Word-Dokumente mit Platzhaltern wie {{VORNAME}} hochladen, benennen, beschreiben und wieder löschen. Der Katalog liegt zentral, alle Berechtigten sehen dieselbe Auswahl.",
-          "Beim Hochladen erkennt das Werkzeug von selbst, welche Platzhalter eine Vorlage enthält.",
-          "Eine Vorlage lässt sich mit beliebig vielen Empfängern befüllen; alle fertigen Dokumente kommen zusammen als ZIP-Datei heraus.",
-          "Für originalgetreue PDFs liegt ein Skript bei, das einen Ordner voller erzeugter Word-Dateien lokal über Microsoft Word als PDF exportiert."
+          "Beim Hochladen erkennt das Werkzeug von selbst, welche Platzhalter eine Vorlage enthält. Die Schreibweise ist dabei egal: {{Geburtsdatum}}, {{geburtsdatum}} und {{GEBURTSDATUM}} sind derselbe Platzhalter.",
+          "Word verteilt einen am Stück getippten Platzhalter intern manchmal auf mehrere Textstücke. Das Werkzeug setzt ihn beim Erzeugen selbst wieder zusammen; die hochgeladene Datei bleibt unangetastet. Nur wenn wirklich etwas dazwischenliegt, das sich nicht überbrücken lässt, erscheint eine Warnung.",
+          "Unter „Vorlagen“ liest der Knopf „Platzhalter neu einlesen“ die Liste frisch aus dem Dokument — nützlich bei Vorlagen, die schon länger im Katalog liegen.",
+          "Ein Platzhalter, den das Werkzeug nicht kennt, bleibt sichtbar im Dokument stehen. Ein Fehler fällt so auf, statt still ein leeres Feld zu hinterlassen.",
+          "Eine Vorlage lässt sich mit beliebig vielen Empfängern befüllen; alle fertigen Dokumente kommen zusammen als ZIP-Datei heraus. Eine Vorschau zeigt vorher, was herauskommt.",
+          "Das Werkzeug erzeugt Word-Dateien — im Browser gibt es keine verlässliche Umwandlung nach PDF. Für originalgetreue PDFs liegen unter „Einstellungen“ ein Skript und ein Starter zum Herunterladen: beide in den entpackten Ordner legen, „pdf-erzeugen.bat“ doppelklicken, fertig. Das läuft über das Word auf dem eigenen Rechner, die Daten verlassen ihn dabei nicht."
         ]
       },
       {
         title: "Woher die Daten kommen",
         items: [
           "Empfänger wahlweise aus dem zentralen Trainerprofil mit Name, Lizenz und Mannschaft — oder aus den Trainerdaten, dann zusätzlich mit Adresse und Bankverbindung.",
-          "Ist der Zugriff auf die Trainerdaten vorhanden, wird diese Quelle beim Öffnen von selbst vorgewählt. Straße, PLZ, Ort und Bankverbindung sind dann sofort da.",
-          "Der Zugriff auf Adresse und Bankverbindung verlangt die Stufe „Administrieren“ für die Trainerdaten — dieselbe Stufe, an der auch deren Verwaltungsbereich hängt. Geprüft wird das bei jedem Zugriff auf dem Server.",
+          "Der Zugriff auf Adresse und Bankverbindung verlangt die Stufe „Administrieren“ für die Trainerdaten — dieselbe Stufe, an der auch deren Verwaltungsbereich hängt. Geprüft wird das bei jedem Zugriff auf dem Server, ein App-Passwort gibt es nicht.",
+          "Ist dieser Zugriff vorhanden, wird die Quelle „Trainerdaten“ beim Öffnen von selbst vorgewählt. Straße, PLZ, Ort und Bankverbindung sind dann sofort da.",
           "Im Reiter „Vorlagen“ steht eine Übersicht aller verfügbaren Platzhalter, gruppiert nach Quelle. Ein Klick kopiert einen Platzhalter in die Zwischenablage, von wo er direkt in die Word-Vorlage wandert."
         ]
       },
       {
         title: "Empfänger filtern",
         items: [
-          "Über der Empfängerliste stehen vier Filter: Mannschaft, Lizenz, Vertrag und Führungszeugnis. Damit geht eine Vorlage gezielt an die Personen, die sie wirklich brauchen.",
-          "Beispiel Übungsleitervertrag: der Filter „Vertrag = noch keiner bereitgestellt“ zeigt genau die, die noch keinen bekommen haben.",
-          "Beispiel Führungszeugnis: der Filter „noch keins hinterlegt“ überspringt alle, die ihres bereits eingereicht haben.",
-          "Filter lassen sich kombinieren und mit dem Suchfeld verbinden. „Alle“ wählt dann nur die gerade angezeigten Empfänger.",
-          "Mannschaft und Lizenz füllen sich aus den geladenen Daten, einschließlich der Einträge „ohne Mannschaft“ und „ohne Lizenz“.",
-          "Vertrag und Führungszeugnis stammen aus den Trainerdaten und stehen deshalb nur bei dieser Datenquelle zur Verfügung.",
-          "Bleiben ausgewählte Empfänger durch einen Filter ausgeblendet, weist die Zeile unter der Liste ausdrücklich darauf hin — sie bekommen trotzdem ein Dokument."
+          "Über der Empfängerliste stehen die Filter Mannschaft, Lizenz, Vertrag, Führungszeugnis und Wohnort. Damit geht eine Vorlage gezielt an die Personen, die sie wirklich brauchen.",
+          "Beispiel Übungsleitervertrag: „Vertrag = noch keiner bereitgestellt“ zeigt genau die, die noch keinen bekommen haben. Beispiel Führungszeugnis: „noch keins hinterlegt“ überspringt alle, die ihres bereits eingereicht haben — und lässt Personen aus, für die gar kein Vertrag vorgesehen ist (Status „Nur Kontaktdaten“).",
+          "Der Wohnort-Filter arbeitet mit Häkchen, es lassen sich also mehrere Orte auf einmal wählen; hinter jedem Ort steht, wie viele Personen dort wohnen. Der Knopf „Umkehren“ ist der kurze Weg zu „alle außer Heiligenstadt“ — gedacht für das erweiterte Führungszeugnis, das außerhalb beim eigenen Meldeamt beantragt werden muss.",
+          "Die zehn Ortsteile von Heilbad Heiligenstadt stehen nicht einzeln in der Liste, sondern stecken in der Gruppe „Heilbad Heiligenstadt“, weil für sie dasselbe Meldeamt zuständig ist. Alle zehn sind klein unter dem Namen aufgeführt, auch wenn dort gerade niemand wohnt.",
+          "Verschiedene Schreibweisen desselben Ortes fallen zu einer Zeile zusammen: „37308 Heiligenstadt“ und „Heilbad Heiligenstadt“, ebenso „Mühlhausen“ und „Muehlhausen“ oder „Weißensee“ und „Weissensee“. Sonst erwischte ein Haken nur einen Teil der Leute.",
+          "Filter lassen sich kombinieren und mit dem Suchfeld verbinden. „Alle“ wählt dann nur die gerade angezeigten Empfänger. Bleiben ausgewählte Empfänger durch einen Filter ausgeblendet, weist die Zeile unter der Liste ausdrücklich darauf hin — sie bekommen trotzdem ein Dokument.",
+          "Vertrag, Führungszeugnis und Wohnort stammen aus den Trainerdaten und stehen deshalb nur bei dieser Datenquelle zur Verfügung."
+        ]
+      },
+      {
+        title: "Fertige Dokumente bereitstellen",
+        items: [
+          "Schritt 4 unter „Dokumente erstellen“: Die fertigen PDFs auswählen — jede Datei wird über ihren Namen automatisch der richtigen Person zugeordnet und landet bei ihr in der Tools-Übersicht unter „Mein Konto“.",
+          "Vor dem Bereitstellen steht die Zuordnung untereinander: was passt, was keiner Person zuzuordnen ist und wer kein Konto in der Tools-Übersicht hat. Nur das Passende geht raus. Der Anzeigename kommt aus dem Dateinamen, nicht aus der gerade oben gewählten Vorlage.",
+          "Auf Wunsch bekommt die Person eine Meldung aufs Handy, und am Reiter „Mein Konto“ erscheint eine kleine rote Zahl. Aufs Handy kommt die Meldung nur bei dem, der die Tools-Übersicht als App abgelegt und Benachrichtigungen eingeschaltet hat — die rote Zahl kommt in jedem Fall.",
+          "„Dateien für alle bereitstellen“ ist für Merkblätter und Vordrucke gedacht, die jeder Angemeldete sehen soll.",
+          "Die Liste „Liegt bereit“ zeigt unter jedem Dokument, ob der Empfänger es angesehen und ob er es gespeichert hat, jeweils mit Datum und Uhrzeit; bei mehrfachem Hineinsehen steht die Anzahl dabei. Bei Dateien „für alle“ steht die Zahl der Personen, wer genau, steht im Aufklapper darunter. Das ersetzt das Nachfragen, ob ein Vertrag oder ein Behördenschreiben angekommen ist.",
+          "Gezählt wird nur der Klick des Empfängers. Wer verteilen darf und selbst hineinsieht, taucht nicht auf. Was jemand danach im PDF-Betrachter tut, sieht die App nicht — deshalb steht dort „angesehen“ und nicht „gelesen“.",
+          "Bereitgestellt wird nur PDF. Eine Word-Datei mit Vereinsstempel wäre nachträglich änderbar."
         ]
       },
       {
@@ -280,8 +141,9 @@ const APP_CHANGELOG = [
         title: "Wer darf was",
         items: [
           "Das Werkzeug ist Bearbeitern vorbehalten. Wer es nur sehen darf, sieht ausschließlich den Reiter „Info“ — weder die Vorlagenverwaltung noch das Erstellen von Dokumenten.",
-          "Bearbeiten: Vorlagen hochladen, umbenennen und löschen sowie Dokumente erstellen.",
-          "Adresse und Bankverbindung aus den Trainerdaten setzen zusätzlich die Stufe „Administrieren“ für die Trainerdaten voraus.",
+          "Bearbeiten: Vorlagen hochladen, umbenennen und löschen sowie Dokumente erstellen und bereitstellen.",
+          "Administrieren: zusätzlich der Reiter „Einstellungen“ mit dem Trainerdaten-Zugriff und den Skripten für die PDF-Erzeugung.",
+          "Adresse und Bankverbindung aus den Trainerdaten setzen die Stufe „Administrieren“ für die Trainerdaten voraus — das ist ein eigenes Recht in der Tools-Übersicht, nicht dasselbe wie das Administrieren dieses Werkzeugs.",
           "Der Vorlagen-Katalog ist auch auf dem Server auf Bearbeiter beschränkt, nicht nur am Bildschirm."
         ]
       },
@@ -290,7 +152,7 @@ const APP_CHANGELOG = [
         items: [
           "Die Ansicht funktioniert am Handy; für das Zusammenstellen von Serienbriefen ist ein Rechner allerdings die bequemere Wahl.",
           "Eingabefelder sind mindestens 16 Pixel groß, damit der iPhone-Browser beim Antippen nicht ungefragt in die Seite hineinzoomt und verschoben stehen bleibt.",
-          "Das Hochladen einer Vorlage funktioniert auch auf älteren iPhones und iPads: die interne Datei-Kennung wird notfalls selbst im geforderten Format erzeugt. Zuvor brach der Upload dort mit einer Fehlermeldung ab."
+          "Das Hochladen einer Vorlage funktioniert auch auf älteren iPhones und iPads: die interne Datei-Kennung wird notfalls selbst im geforderten Format erzeugt."
         ]
       }
     ]
