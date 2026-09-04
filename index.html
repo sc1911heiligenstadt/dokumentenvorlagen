@@ -58,7 +58,7 @@
         <div class="card">
           <h2>1 · Vorlage wählen</h2>
           <div class="form-field" style="max-width:420px;">
-            <label>Dokumentvorlage</label>
+            <label for="tpl-select">Dokumentvorlage</label>
             <select id="tpl-select"></select>
           </div>
           <p class="muted" id="tpl-desc" style="margin-top:10px;"></p>
@@ -219,7 +219,7 @@
           </p>
           <div class="form-grid" style="margin-bottom:8px;">
             <div class="form-field">
-              <label>Anzeigename (leer = Dateiname)</label>
+              <label for="allgemein-name">Anzeigename (leer = Dateiname)</label>
               <input type="text" id="allgemein-name" placeholder="z. B. Merkblatt Führungszeugnis" />
             </div>
           </div>
@@ -261,8 +261,8 @@
           Beim Hochladen erkennt das Tool automatisch, welche Platzhalter enthalten sind.
         </p>
         <div class="form-grid">
-          <div class="form-field"><label>Name der Vorlage</label><input type="text" id="tpl-new-name" placeholder="z. B. Trainervertrag" /></div>
-          <div class="form-field"><label>Beschreibung (optional)</label><input type="text" id="tpl-new-desc" placeholder="kurze Notiz" /></div>
+          <div class="form-field"><label for="tpl-new-name">Name der Vorlage</label><input type="text" id="tpl-new-name" placeholder="z. B. Trainervertrag" /></div>
+          <div class="form-field"><label for="tpl-new-desc">Beschreibung (optional)</label><input type="text" id="tpl-new-desc" placeholder="kurze Notiz" /></div>
         </div>
         <div class="btn-row" style="justify-content:flex-start; gap:10px; margin-top:8px; flex-wrap:wrap;">
           <button type="button" class="btn secondary small" id="btn-tpl-file">Word-Datei wählen (.docx)…</button>
